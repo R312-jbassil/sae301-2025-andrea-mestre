@@ -25,3 +25,11 @@ pnpm-debug.log*
 
 pocketbase/*.md
 pocketbase/pocketbase
+
+# PocketBase data (contains secrets and user data)
+backend/pb_data/data.db
+backend/pb_data/data.db-shm
+backend/pb_data/data.db-wal
+backend/pb_data/storage/
+backend/pb_data/backups/
+backend/pb_data/logs.db
