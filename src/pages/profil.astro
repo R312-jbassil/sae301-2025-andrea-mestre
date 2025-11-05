@@ -1,0 +1,221 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+---
+
+<Layout title="Mon profil - TAVUE">
+  <Header />
+  
+  <main class="min-h-screen relative py-12">
+    <!-- Image de fond -->
+    <div class="absolute inset-0 z-0">
+      <img 
+        src="/background_connexion.webp" 
+        alt="Background" 
+        class="w-full h-full object-cover"
+      />
+      <div class="absolute inset-0 bg-black/30"></div>
+    </div>
+
+    <div class="max-w-4xl mx-auto px-4 relative z-10">
+      <!-- Titre de la page -->
+      <div class="mb-8">
+        <h1 class="text-4xl font-bold text-white mb-2" style="font-family: 'Inter', sans-serif;">Mon profil</h1>
+        <p class="text-white/90" style="font-family: 'Courier Prime', monospace;">Gérez vos informations personnelles</p>
+      </div>
+
+      <!-- Carte du profil -->
+      <div class="bg-white rounded-2xl shadow-lg p-8 mb-6">
+        <!-- Photo de profil et nom -->
+        <div class="flex items-center gap-6 mb-8 pb-8 border-b border-gray-200">
+          <div class="w-24 h-24 bg-[#92400e] rounded-full flex items-center justify-center text-white text-3xl font-bold" id="avatar-placeholder">
+            ?
+          </div>
+          <div>
+            <h2 class="text-2xl font-bold text-gray-900" id="user-fullname">Chargement...</h2>
+            <p class="text-gray-600" id="user-email">email@example.com</p>
+          </div>
+        </div>
+
+        <!-- Informations du compte -->
+        <div class="space-y-6">
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Informations du compte</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Nom complet</label>
+                <div class="px-4 py-3 bg-gray-100 rounded-lg text-gray-900" id="display-fullname">-</div>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                <div class="px-4 py-3 bg-gray-100 rounded-lg text-gray-900" id="display-email">-</div>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Compte créé le</label>
+                <div class="px-4 py-3 bg-gray-100 rounded-lg text-gray-900" id="display-created">-</div>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Compte vérifié</label>
+                <div class="px-4 py-3 bg-gray-100 rounded-lg" id="display-verified">
+                  <span class="inline-flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-gray-400"></span>
+                    <span class="text-gray-600">Non vérifié</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="pt-6 border-t border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Actions</h3>
+            <div class="flex flex-wrap gap-4">
+              <button 
+                id="edit-profile-btn"
+                class="px-6 py-3 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 transition-colors"
+              >
+                Modifier le profil
+              </button>
+              <button 
+                id="change-password-btn"
+                class="px-6 py-3 bg-white text-gray-900 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+              >
+                Changer le mot de passe
+              </button>
+            </div>
+          </div>
+
+          <!-- Déconnexion -->
+          <div class="pt-6 border-t border-gray-200">
+            <button 
+              id="logout-btn"
+              class="w-full md:w-auto px-8 py-3 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors flex items-center justify-center gap-2"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
+              </svg>
+              Se déconnecter
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Message si non connecté -->
+      <div id="not-logged-in" class="hidden bg-white rounded-2xl shadow-lg p-8 text-center">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-16 h-16 mx-auto mb-4 text-gray-400">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+        </svg>
+        <h2 class="text-2xl font-bold text-gray-900 mb-2">Vous n'êtes pas connecté</h2>
+        <p class="text-gray-600 mb-6">Connectez-vous pour accéder à votre profil</p>
+        <a 
+          href="/connexion"
+          class="inline-block px-8 py-3 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 transition-colors no-underline"
+        >
+          Se connecter
+        </a>
+      </div>
+    </div>
+  </main>
+</Layout>
+
+<script>
+  import pb from '../utils/pb';
+
+  const logoutBtn = document.getElementById('logout-btn');
+  const notLoggedInSection = document.getElementById('not-logged-in');
+  const editProfileBtn = document.getElementById('edit-profile-btn');
+  const changePasswordBtn = document.getElementById('change-password-btn');
+
+  // Fonction pour formater la date
+  function formatDate(dateString: string): string {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('fr-FR', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
+  }
+
+  // Fonction pour afficher les informations du profil
+  function displayUserProfile() {
+    if (!pb.authStore.isValid || !pb.authStore.model) {
+      // Utilisateur non connecté - redirection vers connexion
+      document.querySelector('.bg-white.rounded-2xl.shadow-lg')?.classList.add('hidden');
+      notLoggedInSection?.classList.remove('hidden');
+      return;
+    }
+
+    const user = pb.authStore.model;
+    
+    // Avatar (première lettre du nom)
+    const avatarPlaceholder = document.getElementById('avatar-placeholder');
+    if (avatarPlaceholder) {
+      const firstLetter = user.nomcomplet?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || '?';
+      avatarPlaceholder.textContent = firstLetter;
+    }
+
+    // Nom complet et email (header)
+    const userFullname = document.getElementById('user-fullname');
+    const userEmail = document.getElementById('user-email');
+    if (userFullname) {
+      userFullname.textContent = user.nomcomplet || 'Utilisateur';
+    }
+    if (userEmail) {
+      userEmail.textContent = user.email || '';
+    }
+
+    // Informations détaillées
+    const displayFullname = document.getElementById('display-fullname');
+    const displayEmail = document.getElementById('display-email');
+    const displayCreated = document.getElementById('display-created');
+    const displayVerified = document.getElementById('display-verified');
+
+    if (displayFullname) {
+      displayFullname.textContent = user.nomcomplet || '-';
+    }
+    if (displayEmail) {
+      displayEmail.textContent = user.email || '-';
+    }
+    if (displayCreated) {
+      displayCreated.textContent = user.created ? formatDate(user.created) : '-';
+    }
+    if (displayVerified) {
+      if (user.verified) {
+        displayVerified.innerHTML = `
+          <span class="inline-flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-green-500"></span>
+            <span class="text-green-700">Vérifié</span>
+          </span>
+        `;
+      } else {
+        displayVerified.innerHTML = `
+          <span class="inline-flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-yellow-500"></span>
+            <span class="text-yellow-700">Non vérifié</span>
+          </span>
+        `;
+      }
+    }
+  }
+
+  // Bouton de déconnexion
+  logoutBtn?.addEventListener('click', () => {
+    if (confirm('Voulez-vous vraiment vous déconnecter ?')) {
+      pb.authStore.clear();
+      window.location.href = '/';
+    }
+  });
+
+  // Bouton modifier le profil
+  editProfileBtn?.addEventListener('click', () => {
+    alert('Fonctionnalité de modification du profil à venir !');
+  });
+
+  // Bouton changer le mot de passe
+  changePasswordBtn?.addEventListener('click', () => {
+    alert('Fonctionnalité de changement de mot de passe à venir !');
+  });
+
+  // Afficher les informations au chargement
+  displayUserProfile();
+</script>

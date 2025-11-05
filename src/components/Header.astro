@@ -56,15 +56,40 @@ import LogoSvg from '../assets/Logo_sae.svg?raw';
         </button>
 
         <!-- Compte utilisateur -->
-        <button 
-          class="flex items-center justify-center p-2 text-gray-800 hover:text-[#92400e] hover:bg-gray-100 rounded-md transition-all cursor-pointer border-0 bg-transparent"
-          aria-label="Mon compte"
-          title="Mon compte"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-          </svg>
-        </button>
+        <div class="relative" id="user-account-container">
+          <a 
+            href="/connexion"
+            id="user-account-link"
+            class="flex items-center gap-2 p-2 text-gray-800 hover:text-[#92400e] hover:bg-gray-100 rounded-md transition-all no-underline"
+            aria-label="Mon compte"
+            title="Mon compte"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+            </svg>
+            <span id="user-name" class="hidden text-sm font-medium"></span>
+          </a>
+          
+          <!-- Menu déroulant au survol -->
+          <div 
+            id="user-dropdown" 
+            class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 border border-gray-200 z-50"
+          >
+            <a href="/profil" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 no-underline">
+              Mon profil
+            </a>
+            <a href="/commandes" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 no-underline">
+              Mes commandes
+            </a>
+            <hr class="my-1 border-gray-200">
+            <button 
+              id="logout-button"
+              class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 cursor-pointer border-0 bg-transparent"
+            >
+              Se déconnecter
+            </button>
+          </div>
+        </div>
 
         <!-- Panier -->
         <button 
@@ -101,3 +126,74 @@ import LogoSvg from '../assets/Logo_sae.svg?raw';
     </nav>
   </div>
 </header>
+
+<script>
+  import pb from '../utils/pb';
+
+  // Vérifier si l'utilisateur est connecté
+  const userNameElement = document.getElementById('user-name');
+  const userAccountLink = document.getElementById('user-account-link');
+  const userAccountContainer = document.getElementById('user-account-container');
+  const userDropdown = document.getElementById('user-dropdown');
+  const logoutButton = document.getElementById('logout-button');
+  
+  let isLoggedIn = false;
+
+  function updateUserDisplay() {
+    if (pb.authStore.isValid && pb.authStore.model) {
+      isLoggedIn = true;
+      const user = pb.authStore.model;
+      const userName = user.nomcomplet || user.email?.split('@')[0] || 'Utilisateur';
+      
+      if (userNameElement) {
+        userNameElement.textContent = userName;
+        userNameElement.classList.remove('hidden');
+      }
+      
+      // Changer le lien pour aller vers le profil ou une page dédiée
+      if (userAccountLink) {
+        userAccountLink.setAttribute('href', '/profil');
+        userAccountLink.setAttribute('title', `Bonjour ${userName}`);
+      }
+    } else {
+      isLoggedIn = false;
+      if (userNameElement) {
+        userNameElement.classList.add('hidden');
+      }
+      if (userAccountLink) {
+        userAccountLink.setAttribute('href', '/connexion');
+        userAccountLink.setAttribute('title', 'Mon compte');
+      }
+    }
+  }
+  
+  // Gérer le survol pour afficher/masquer le menu déroulant
+  if (userAccountContainer && userDropdown) {
+    userAccountContainer.addEventListener('mouseenter', () => {
+      if (isLoggedIn) {
+        userDropdown.classList.remove('hidden');
+      }
+    });
+    
+    userAccountContainer.addEventListener('mouseleave', () => {
+      userDropdown.classList.add('hidden');
+    });
+  }
+  
+  // Gérer la déconnexion
+  if (logoutButton) {
+    logoutButton.addEventListener('click', async (e) => {
+      e.preventDefault();
+      pb.authStore.clear();
+      window.location.href = '/';
+    });
+  }
+  
+  // Mettre à jour l'affichage au chargement de la page
+  updateUserDisplay();
+  
+  // Écouter les changements d'authentification
+  pb.authStore.onChange(() => {
+    updateUserDisplay();
+  });
+</script>
