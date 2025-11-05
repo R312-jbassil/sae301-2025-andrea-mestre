@@ -131,6 +131,8 @@ import googleIcon from '../assets/images/google.webp';
     <!-- Boutons OAuth -->
     <div class="grid grid-cols-2 gap-4">
       <button 
+        id="google-btn-inscription"
+        type="button"
         class="flex items-center justify-center gap-2 px-4 py-3 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
         aria-label="S'inscrire avec Google"
       >
@@ -167,6 +169,32 @@ import googleIcon from '../assets/images/google.webp';
   });
   
   inscriptionTab?.addEventListener('click', () => {
+  });
+
+  // OAuth Google
+  const googleBtn = document.getElementById('google-btn-inscription');
+  
+  googleBtn?.addEventListener('click', async () => {
+    try {
+      const authData = await pb.collection('users').authWithOAuth2({ provider: 'google' });
+      
+      if (authData) {
+        if (successMessage) {
+          successMessage.textContent = 'Inscription avec Google réussie !';
+          successMessage.classList.remove('hidden');
+        }
+        
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 1000);
+      }
+    } catch (error: any) {
+      console.error('Erreur OAuth Google:', error);
+      if (errorMessage) {
+        errorMessage.textContent = error.message || 'Erreur lors de l\'inscription avec Google';
+        errorMessage.classList.remove('hidden');
+      }
+    }
   });
 
   form?.addEventListener('submit', async (e) => {

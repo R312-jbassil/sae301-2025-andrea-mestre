@@ -93,6 +93,8 @@ import googleIcon from '../assets/images/google.webp';
 
     <div class="grid grid-cols-2 gap-4">
       <button 
+        id="google-btn"
+        type="button"
         class="flex items-center justify-center gap-2 px-4 py-3 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
         aria-label="Se connecter avec Google"
       >
@@ -129,6 +131,32 @@ import googleIcon from '../assets/images/google.webp';
   
   inscriptionTab?.addEventListener('click', () => {
     window.dispatchEvent(new CustomEvent('changeAuthView', { detail: 'inscription' }));
+  });
+
+  // OAuth Google
+  const googleBtn = document.getElementById('google-btn');
+  
+  googleBtn?.addEventListener('click', async () => {
+    try {
+      const authData = await pb.collection('users').authWithOAuth2({ provider: 'google' });
+      
+      if (authData) {
+        if (successMessage) {
+          successMessage.textContent = 'Connexion avec Google réussie !';
+          successMessage.classList.remove('hidden');
+        }
+        
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 1000);
+      }
+    } catch (error: any) {
+      console.error('Erreur OAuth Google:', error);
+      if (errorMessage) {
+        errorMessage.textContent = error.message || 'Erreur lors de la connexion avec Google';
+        errorMessage.classList.remove('hidden');
+      }
+    }
   });
 
   form?.addEventListener('submit', async (e) => {
