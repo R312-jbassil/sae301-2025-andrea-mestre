@@ -7,6 +7,11 @@ import StarsSvg from '../assets/Stars.svg?raw';
 import IconLunetteSvg from '../assets/iconlunette.svg?raw';
 import Icon3dSvg from '../assets/icon3d.svg?raw';
 import IaSvg from '../assets/ia.svg?raw';
+import FavoriSvg from '../assets/favori.svg?raw';
+import HavaneImg from '../assets/images/havane.webp';
+import Etui1Img from '../assets/images/etui1.webp';
+import Etui2Img from '../assets/images/etui2.webp';
+import ChevronSvg from '../assets/chevron.svg?raw';
 ---
 
 <Layout title="Configurateur - TAVUE">
@@ -117,22 +122,31 @@ import IaSvg from '../assets/ia.svg?raw';
 			<!-- Sous-menu de navigation sticky -->
 			<ConfiguratorNav />
 
-			<div class="flex flex-col gap-4 px-8 pb-8">
+			<div class="flex flex-col gap-12 px-8 pb-8">
 
 				<!-- Étape 1: TAILLE -->
 				<div id="step-1" class="border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-shadow scroll-mt-24">
 					<div class="flex items-center justify-between px-6 py-4 bg-white cursor-pointer hover:bg-gray-50 transition-colors">
-						<span class="font-semibold tracking-wide text-sm" style="font-family: var(--font-subtitle);">1. TAILLE</span>
-						<span class="text-xl">📏</span>
-						<button class="text-2xl bg-transparent border-0 cursor-pointer transition-transform">›</button>
+						<span class="font-semibold tracking-wide text-lg" style="font-family: var(--font-subtitle);">1. TAILLE</span>
 					</div>
 					<div class="px-6 py-6 bg-gray-50 border-t border-gray-200">
-						<div class="flex gap-2 flex-wrap">
-							<button class="size-btn px-4 py-2 bg-black text-white border-2 border-black rounded-lg text-xs tracking-wide transition-all hover:border-gray-500" data-size="S">S. TAILLE</button>
-							<button class="size-btn px-4 py-2 bg-white border-2 border-gray-200 rounded-lg text-xs tracking-wide transition-all hover:border-gray-500" data-size="M">M. VERRE</button>
-							<button class="size-btn px-4 py-2 bg-white border-2 border-gray-200 rounded-lg text-xs tracking-wide transition-all hover:border-gray-500" data-size="L">L. CERCLES</button>
-							<button class="size-btn px-4 py-2 bg-white border-2 border-gray-200 rounded-lg text-xs tracking-wide transition-all hover:border-gray-500" data-size="XL">XL. BRANCHES</button>
-							<button class="size-btn px-4 py-2 bg-white border-2 border-gray-200 rounded-lg text-xs tracking-wide transition-all hover:border-gray-500" data-size="XXL">XXL. ÉTUI</button>
+						<div class="flex items-center justify-between">
+							<span class="text-base font-medium" style="font-family: var(--font-body);">TAILLE</span>
+							<div class="flex items-center gap-4">
+								<span class="text-base font-normal" style="font-family: var(--font-body);" id="size-value">60-18</span>
+								<div class="flex items-center gap-2">
+									<button class="size-prev-btn w-10 h-10 flex items-center justify-center bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition-all" aria-label="Taille précédente">
+										<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+											<path d="M15 18l-6-6 6-6"/>
+										</svg>
+									</button>
+									<button class="size-next-btn w-10 h-10 flex items-center justify-center bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition-all" aria-label="Taille suivante">
+										<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+											<path d="M9 18l6-6-6-6"/>
+										</svg>
+									</button>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -140,8 +154,7 @@ import IaSvg from '../assets/ia.svg?raw';
 				<!-- Étape 2: VERRES -->
 				<div id="step-2" class="border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-shadow scroll-mt-24">
 					<div class="flex items-center justify-between px-6 py-4 bg-white cursor-pointer hover:bg-gray-50 transition-colors">
-						<span class="font-semibold tracking-wide text-sm" style="font-family: var(--font-subtitle);">2. VERRES</span>
-						<button class="text-2xl bg-transparent border-0 cursor-pointer transition-transform">›</button>
+						<span class="font-semibold tracking-wide text-lg" style="font-family: var(--font-subtitle);">2. VERRES</span>
 					</div>
 					<div class="px-6 py-6 bg-gray-50 border-t border-gray-200">
 						<div class="flex flex-col gap-3">
@@ -164,23 +177,26 @@ import IaSvg from '../assets/ia.svg?raw';
 				<!-- Étape 3: CERCLES -->
 				<div id="step-3" class="border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-shadow scroll-mt-24">
 					<div class="flex items-center justify-between px-6 py-4 bg-white cursor-pointer hover:bg-gray-50 transition-colors">
-						<span class="font-semibold tracking-wide text-sm" style="font-family: var(--font-subtitle);">3. CERCLES</span>
-						<button class="text-2xl bg-transparent border-0 cursor-pointer transition-transform">›</button>
+						<span class="font-semibold tracking-wide text-lg" style="font-family: var(--font-subtitle);">3. CERCLES</span>
 					</div>
 					<div class="px-6 py-6 bg-gray-50 border-t border-gray-200">
-						<div class="grid grid-cols-[repeat(auto-fill,minmax(100px,1fr))] gap-4">
-							<button class="color-btn relative aspect-square border-2 border-gray-200 rounded-xl cursor-pointer transition-all hover:scale-105 hover:shadow-md" data-color="#1f2937" style="background-color: #1f2937;" title="Blanc">
-								<span class="absolute bottom-2 text-[10px] tracking-wide bg-white/90 px-2 py-1 rounded text-black">Blanc</span>
+						<div class="grid grid-cols-4 gap-6">
+							<button class="color-btn flex flex-col items-center gap-3 cursor-pointer transition-all hover:scale-105" data-color="#f5f5f5" title="Blanc">
+								<div class="w-full aspect-square border border-gray-200 rounded-lg" style="background-color: #f5f5f5;"></div>
+								<span class="text-sm" style="font-family: var(--font-body);">Blanc</span>
 							</button>
-							<button class="color-btn relative aspect-square border-[3px] border-black rounded-xl cursor-pointer transition-all hover:scale-105 hover:shadow-md shadow-[0_0_0_2px_white,0_0_0_4px_black]" data-color="#000000" style="background-color: #000000;" title="Noir">
-								<span class="absolute top-2 right-2 text-yellow-400 text-base">★</span>
-								<span class="absolute bottom-2 text-[10px] tracking-wide bg-white/90 px-2 py-1 rounded text-black">Noir</span>
+							<button class="color-btn flex flex-col items-center gap-3 cursor-pointer transition-all hover:scale-105 relative" data-color="#000000" title="Noir">
+								<span class="absolute -top-4 right-1 text-yellow-400 text-2xl">★</span>
+								<div class="w-full aspect-square border border-gray-200 rounded-lg" style="background-color: #000000;"></div>
+								<span class="text-sm" style="font-family: var(--font-body);">Noir</span>
 							</button>
-							<button class="color-btn relative aspect-square border-2 border-gray-200 rounded-xl cursor-pointer transition-all hover:scale-105 hover:shadow-md" data-color="#fbbf24" style="background-color: #fbbf24;" title="Or">
-								<span class="absolute bottom-2 text-[10px] tracking-wide bg-white/90 px-2 py-1 rounded text-black">Or</span>
+							<button class="color-btn flex flex-col items-center gap-3 cursor-pointer transition-all hover:scale-105 relative" data-color="#f4c542" title="Or">
+								<div class="w-full aspect-square border border-gray-200 rounded-lg" style="background-color: #f4c542;"></div>
+								<span class="text-sm" style="font-family: var(--font-body);">Or</span>
 							</button>
-							<button class="color-btn relative aspect-square border-2 border-gray-200 rounded-xl cursor-pointer transition-all hover:scale-105 hover:shadow-md" data-color="#f4a460" style="background-color: #f4a460;" title="Cuivre Brillant">
-								<span class="absolute bottom-2 text-[10px] tracking-wide bg-white/90 px-2 py-1 rounded text-black">Cuivre Brillant</span>
+							<button class="color-btn flex flex-col items-center gap-3 cursor-pointer transition-all hover:scale-105" data-color="#e6b8a8" title="Cuivre Brillant">
+								<div class="w-full aspect-square border border-gray-200 rounded-lg" style="background-color: #e6b8a8;"></div>
+								<span class="text-sm" style="font-family: var(--font-body);">Cuivre Brillant</span>
 							</button>
 						</div>
 					</div>
@@ -189,23 +205,30 @@ import IaSvg from '../assets/ia.svg?raw';
 				<!-- Étape 4: BRANCHES -->
 				<div id="step-4" class="border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-shadow scroll-mt-24">
 					<div class="flex items-center justify-between px-6 py-4 bg-white cursor-pointer hover:bg-gray-50 transition-colors">
-						<span class="font-semibold tracking-wide text-sm" style="font-family: var(--font-subtitle);">4. BRANCHES</span>
-						<button class="text-2xl bg-transparent border-0 cursor-pointer transition-transform">›</button>
+						<span class="font-semibold tracking-wide text-lg" style="font-family: var(--font-subtitle);">4. BRANCHES</span>
 					</div>
 					<div class="px-6 py-6 bg-gray-50 border-t border-gray-200">
-						<div class="grid grid-cols-[repeat(auto-fill,minmax(100px,1fr))] gap-4">
-							<button class="color-btn relative aspect-square border-2 border-gray-200 rounded-xl cursor-pointer transition-all hover:scale-105 hover:shadow-md" data-color="transparent" data-part="temples" style="background: linear-gradient(135deg, #f3f4f6 50%, transparent 50%);" title="Transparent">
-								<span class="absolute bottom-2 text-[10px] tracking-wide bg-white/90 px-2 py-1 rounded text-black">Transparent</span>
+						<div class="grid grid-cols-4 gap-6">
+							<button class="color-btn flex flex-col items-center gap-3 cursor-pointer transition-all hover:scale-105" data-color="transparent" data-part="temples" title="Transparent">
+								<div class="w-full aspect-square border border-gray-200 rounded-lg bg-white"></div>
+								<span class="text-sm" style="font-family: var(--font-body);">Transparent</span>
 							</button>
-							<button class="color-btn relative aspect-square border-2 border-gray-200 rounded-xl cursor-pointer transition-all hover:scale-105 hover:shadow-md" data-color="#92400e" data-part="temples" style="background-color: #92400e;" title="Havana">
-								<span class="absolute bottom-2 text-[10px] tracking-wide bg-white/90 px-2 py-1 rounded text-black">Havana</span>
+							<button class="color-btn flex flex-col items-center gap-3 cursor-pointer transition-all hover:scale-105" data-color="#92400e" data-part="temples" title="Havane">
+								<div class="w-full aspect-square border border-gray-200 rounded-lg overflow-hidden">
+									<img src={HavaneImg.src} alt="Havane" class="w-full h-full object-cover" />
+								</div>
+								<span class="text-sm" style="font-family: var(--font-body);">Havane</span>
 							</button>
-							<button class="color-btn relative aspect-square border-[3px] border-black rounded-xl cursor-pointer transition-all hover:scale-105 hover:shadow-md shadow-[0_0_0_2px_white,0_0_0_4px_black]" data-color="#000000" data-part="temples" style="background-color: #000000;" title="Noir">
-								<span class="absolute top-2 right-2 text-yellow-400 text-base">★</span>
-								<span class="absolute bottom-2 text-[10px] tracking-wide bg-white/90 px-2 py-1 rounded text-black">Noir</span>
-							</button>
-							<button class="color-btn relative aspect-square border-2 border-gray-200 rounded-xl cursor-pointer transition-all hover:scale-105 hover:shadow-md" data-color="#d1d5db" data-part="temples" style="background-color: #d1d5db;" title="Blanc">
-								<span class="absolute bottom-2 text-[10px] tracking-wide bg-white/90 px-2 py-1 rounded text-black">Blanc</span>
+							<div class="flex flex-col items-center gap-3 relative">
+								<span class="absolute -top-4 right-1 text-yellow-400 text-2xl">★</span>
+								<button class="color-btn w-full cursor-pointer transition-all hover:scale-105" data-color="#000000" data-part="temples" title="Noir">
+									<div class="w-full aspect-square border border-gray-200 rounded-lg" style="background-color: #000000;"></div>
+								</button>
+								<span class="text-sm" style="font-family: var(--font-body);">Noir</span>
+							</div>
+							<button class="color-btn flex flex-col items-center gap-3 cursor-pointer transition-all hover:scale-105" data-color="#ffffff" data-part="temples" title="Blanc">
+								<div class="w-full aspect-square border border-gray-200 rounded-lg" style="background-color: #ffffff;"></div>
+								<span class="text-sm" style="font-family: var(--font-body);">Blanc</span>
 							</button>
 						</div>
 					</div>
@@ -214,18 +237,21 @@ import IaSvg from '../assets/ia.svg?raw';
 				<!-- Étape 5: ÉTUI -->
 				<div id="step-5" class="border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-shadow scroll-mt-24">
 					<div class="flex items-center justify-between px-6 py-4 bg-white cursor-pointer hover:bg-gray-50 transition-colors">
-						<span class="font-semibold tracking-wide text-sm" style="font-family: var(--font-subtitle);">5. ÉTUI</span>
-						<button class="text-2xl bg-transparent border-0 cursor-pointer transition-transform">›</button>
+						<span class="font-semibold tracking-wide text-lg" style="font-family: var(--font-subtitle);">5. ÉTUI</span>
 					</div>
 					<div class="px-6 py-6 bg-gray-50 border-t border-gray-200">
-						<div class="grid grid-cols-2 gap-4">
-							<button class="case-btn flex flex-col items-center gap-3 p-6 bg-white border-2 border-gray-200 rounded-xl cursor-pointer transition-all hover:border-gray-500" data-case="hard">
-								<img src="/case-hard.png" alt="Étui rigide" class="w-full h-20 object-contain" />
-								<span>Étui rigide</span>
+						<div class="grid grid-cols-2 gap-6">
+							<button class="case-btn flex flex-col items-center gap-3 cursor-pointer transition-all hover:scale-105" data-case="hard">
+								<div class="w-full aspect-square border border-gray-200 rounded-lg bg-white overflow-hidden p-4 flex items-center justify-center">
+									<img src={Etui1Img.src} alt="Étui rigide" class="w-full h-full object-contain" />
+								</div>
+								<span class="text-sm" style="font-family: var(--font-body);">Étui rigide</span>
 							</button>
-							<button class="case-btn flex flex-col items-center gap-3 p-6 bg-white border-[3px] border-black rounded-xl cursor-pointer transition-all hover:border-gray-500" data-case="soft">
-								<img src="/case-soft.png" alt="Étui souple" class="w-full h-20 object-contain" />
-								<span>Étui souple</span>
+							<button class="case-btn flex flex-col items-center gap-3 cursor-pointer transition-all hover:scale-105" data-case="soft">
+								<div class="w-full aspect-square border border-gray-200 rounded-lg bg-white overflow-hidden p-4 flex items-center justify-center">
+									<img src={Etui2Img.src} alt="Étui souple" class="w-full h-full object-contain" />
+								</div>
+								<span class="text-sm" style="font-family: var(--font-body);">Étui souple</span>
 							</button>
 						</div>
 					</div>
@@ -233,13 +259,18 @@ import IaSvg from '../assets/ia.svg?raw';
 			</div>
 
 			<!-- Footer avec prix -->
-			<div class="sticky bottom-0 bg-white pt-8 mt-8 px-8">
-				<div class="h-px bg-gray-200 mb-6"></div>
-				<div class="flex items-center gap-4 pb-8 flex-wrap">
-					<button class="w-10 h-10 bg-white border-2 border-black rounded-lg flex items-center justify-center text-xl hover:bg-black hover:text-white transition-all">↩</button>
-					<span class="text-2xl font-bold" style="font-family: var(--font-title);">146 €</span>
-					<button class="flex-1 px-6 py-3 bg-transparent border-2 border-black rounded-lg text-sm tracking-wide transition-all hover:bg-gray-100" style="font-family: var(--font-btn);">Ajouter au panier</button>
-					<button class="px-6 py-3 bg-black text-white border-2 border-black rounded-lg text-sm tracking-wide transition-all hover:bg-gray-800" style="font-family: var(--font-btn);">Passer à la commande</button>
+			<div class="sticky bottom-0 bg-[#2A2017] px-8 py-6">
+				<div class="flex items-center justify-between gap-6 flex-wrap">
+					<button class="w-12 h-12 bg-transparent border-0 flex items-center justify-center text-white text-2xl hover:opacity-70 transition-all cursor-pointer" aria-label="Retour">
+						<span set:html={ChevronSvg}></span>
+					</button>
+					<span class="text-3xl font-bold text-white" style="font-family: var(--font-title);">146 €</span>
+					<button class="px-8 py-3 bg-white text-black rounded-full text-sm font-semibold tracking-wider hover:bg-gray-100 transition-all whitespace-nowrap" style="font-family: var(--font-body);">
+						ENREGISTRER
+					</button>
+					<button class="px-8 py-3 bg-white text-black rounded-full text-sm font-semibold tracking-wider hover:bg-gray-100 transition-all whitespace-nowrap" style="font-family: var(--font-body);">
+						AJOUTER AU PANIER
+					</button>
 				</div>
 			</div>
 		</section>
@@ -257,12 +288,6 @@ import IaSvg from '../assets/ia.svg?raw';
 
 	.dot.active {
 		background-color: #2d2d2d !important;
-	}
-
-	.size-btn.active {
-		background-color: black !important;
-		color: white !important;
-		border-color: black !important;
 	}
 
 	.color-btn.active {
@@ -283,12 +308,22 @@ import IaSvg from '../assets/ia.svg?raw';
 	// État de la configuration
 	let config = {
 		size: 'S',
+		sizeIndex: 0,
 		lenses: 'clear',
 		frameColor: '#1D1D1B',
 		templeColor: '#1D1D1B',
 		case: 'soft',
 		price: 146
 	};
+
+	// Tailles disponibles
+	const sizes = [
+		{ label: '1. TAILLE', value: '60-18' },
+		{ label: '2. TAILLE', value: '62-19' },
+		{ label: '3. TAILLE', value: '64-20' },
+		{ label: '4. TAILLE', value: '66-21' },
+		{ label: '5. TAILLE', value: '68-22' }
+	];
 
 	// Attendre que le DOM soit chargé
 	document.addEventListener('DOMContentLoaded', () => {
@@ -306,20 +341,12 @@ import IaSvg from '../assets/ia.svg?raw';
 		const strokePaths = svg.querySelectorAll('path[stroke="#1D1D1B"]');
 
 		// ===== FONCTIONS DE MISE À JOUR DU SVG =====
-		function updateGlassesSize(size: string) {
-			if (!svg) return;
+		function updateGlassesSize(sizeIndex: number) {
+			config.sizeIndex = sizeIndex;
 
-			const scales = {
-				'S': 0.7,
-				'M': 0.85,
-				'L': 1.0,
-				'XL': 1.15,
-				'XXL': 1.3
-			};
-
-			const scale = scales[size as keyof typeof scales] || 1.0;
-			svg.style.transform = `scale(${scale})`;
-			config.size = size;
+			// Mettre à jour uniquement l'affichage de la valeur
+			const sizeValue = document.getElementById('size-value');
+			if (sizeValue) sizeValue.textContent = sizes[sizeIndex].value;
 		}
 
 		function updateLensType(type: string) {
@@ -374,19 +401,17 @@ import IaSvg from '../assets/ia.svg?raw';
 		}
 
 		// ===== GESTION DES BOUTONS DE TAILLE =====
-		document.querySelectorAll('.size-btn').forEach(btn => {
-			btn.addEventListener('click', (e) => {
-				const target = e.target as HTMLElement;
-				const size = target.getAttribute('data-size');
-				if (!size) return;
+		const sizePrevBtn = document.querySelector('.size-prev-btn');
+		const sizeNextBtn = document.querySelector('.size-next-btn');
 
-				// Mise à jour de l'état actif
-				document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
-				target.classList.add('active');
+		sizePrevBtn?.addEventListener('click', () => {
+			const newIndex = Math.max(0, config.sizeIndex - 1);
+			updateGlassesSize(newIndex);
+		});
 
-				// Mise à jour du SVG
-				updateGlassesSize(size);
-			});
+		sizeNextBtn?.addEventListener('click', () => {
+			const newIndex = Math.min(sizes.length - 1, config.sizeIndex + 1);
+			updateGlassesSize(newIndex);
 		});
 
 		// ===== GESTION DES VERRES =====
@@ -459,6 +484,7 @@ import IaSvg from '../assets/ia.svg?raw';
 			// Réinitialiser la configuration
 			config = {
 				size: 'S',
+				sizeIndex: 0,
 				lenses: 'clear',
 				frameColor: '#1D1D1B',
 				templeColor: '#1D1D1B',
@@ -467,15 +493,12 @@ import IaSvg from '../assets/ia.svg?raw';
 			};
 
 			// Réinitialiser l'interface
-			updateGlassesSize('S');
+			updateGlassesSize(0);
 			updateLensType('clear');
 			updateFrameColor('#1D1D1B');
 			updateTempleColor('#1D1D1B');
 
 			// Réinitialiser les boutons actifs
-			document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
-			document.querySelector('.size-btn[data-size="S"]')?.classList.add('active');
-			
 			document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
 			
 			// Réinitialiser le nom
@@ -589,9 +612,14 @@ import IaSvg from '../assets/ia.svg?raw';
 				// Scroller vers l'étape correspondante
 				const stepElement = document.getElementById(`step-${stepNumber}`);
 				if (stepElement && configSection) {
-					const offsetTop = stepElement.offsetTop - 100; // Offset pour le menu sticky
+					// Calculer la position relative à la section scrollable
+					const sectionRect = configSection.getBoundingClientRect();
+					const stepRect = stepElement.getBoundingClientRect();
+					const currentScroll = configSection.scrollTop;
+					const targetScroll = currentScroll + stepRect.top - sectionRect.top - 150; // 150px offset pour le menu sticky
+					
 					configSection.scrollTo({
-						top: offsetTop,
+						top: targetScroll,
 						behavior: 'smooth'
 					});
 				}
@@ -631,6 +659,6 @@ import IaSvg from '../assets/ia.svg?raw';
 		updateLensType('clear');
 		updateFrameColor('#1D1D1B');
 		updateTempleColor('#1D1D1B');
-		updateGlassesSize('S');
+		updateGlassesSize(0);
 	});
 </script>
