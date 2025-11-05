@@ -10,6 +10,16 @@ const pb = new PocketBase(path) as TypedPocketBase;
 
 export default pb;
 
+// Fonction pour vérifier si l'utilisateur est connecté
+export function isUserAuthenticated() {
+  return pb.authStore.isValid && pb.authStore.model !== null;
+}
+
+// Fonction pour obtenir l'utilisateur connecté
+export function getCurrentUser() {
+  return pb.authStore.model;
+}
+
 // Fonction pour la connexion OAuth
 export async function loginWithOAuth(provider: 'google' | 'apple' | 'github') {
   try {
@@ -34,12 +44,24 @@ export interface LunetteData {
   branches: string;
   etui?: string;
   origine_lunette?: string;
+  user?: string; // ID de l'utilisateur propriétaire
 }
 
-// Créer une nouvelle lunette
+// Créer une nouvelle lunette (nécessite une connexion)
 export async function createLunette(data: LunetteData) {
   try {
-    const record = await pb.collection('lunette').create(data);
+    // Vérifier si l'utilisateur est connecté
+    if (!pb.authStore.isValid || !pb.authStore.model) {
+      return { success: false, error: 'Vous devez être connecté pour créer une lunette.' };
+    }
+
+    // Ajouter automatiquement l'ID de l'utilisateur connecté
+    const lunetteData = {
+      ...data,
+      user: pb.authStore.model.id
+    };
+
+    const record = await pb.collection('lunette').create(lunetteData);
     return { success: true, data: record };
   } catch (error: any) {
     console.error('Erreur lors de la création de la lunette:', error);
@@ -47,10 +69,21 @@ export async function createLunette(data: LunetteData) {
   }
 }
 
-// Récupérer une lunette par son ID
+// Récupérer une lunette par son ID (vérification du propriétaire)
 export async function getLunette(id: string) {
   try {
+    // Vérifier si l'utilisateur est connecté
+    if (!pb.authStore.isValid || !pb.authStore.model) {
+      return { success: false, error: 'Vous devez être connecté pour voir cette lunette.' };
+    }
+
     const record = await pb.collection('lunette').getOne(id);
+    
+    // Vérifier que la lunette appartient à l'utilisateur connecté
+    if (record.user !== pb.authStore.model.id) {
+      return { success: false, error: 'Vous n\'avez pas accès à cette lunette.' };
+    }
+    
     return { success: true, data: record };
   } catch (error: any) {
     console.error('Erreur lors de la récupération de la lunette:', error);
@@ -58,11 +91,18 @@ export async function getLunette(id: string) {
   }
 }
 
-// Récupérer toutes les lunettes
+// Récupérer toutes les lunettes de l'utilisateur connecté
 export async function getAllLunettes(page = 1, perPage = 50) {
   try {
+    // Vérifier si l'utilisateur est connecté
+    if (!pb.authStore.isValid || !pb.authStore.model) {
+      return { success: false, error: 'Vous devez être connecté pour voir vos lunettes.' };
+    }
+
+    // Filtrer les lunettes par utilisateur connecté
     const resultList = await pb.collection('lunette').getList(page, perPage, {
       sort: '-created',
+      filter: `user = "${pb.authStore.model.id}"`
     });
     return { success: true, data: resultList.items, totalPages: resultList.totalPages };
   } catch (error: any) {

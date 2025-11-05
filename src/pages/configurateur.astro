@@ -311,7 +311,7 @@ import ChevronSvg from '../assets/chevron.svg?raw';
 </style>
 
 <script>
-	import { createLunette, updateLunette, getLunette, type LunetteData } from '../utils/pb';
+	import { createLunette, updateLunette, getLunette, isUserAuthenticated, type LunetteData } from '../utils/pb';
 
 	// ===== GESTION DES INTERACTIONS =====
 	
@@ -644,6 +644,14 @@ import ChevronSvg from '../assets/chevron.svg?raw';
 	// ===== BOUTON SAUVEGARDER =====
 	document.querySelector('.save-btn')?.addEventListener('click', async () => {
 		try {
+			// Vérifier si l'utilisateur est connecté
+			if (!isUserAuthenticated()) {
+				alert('❌ Vous devez être connecté pour sauvegarder une lunette.\n\nVeuillez vous connecter d\'abord.');
+				// Rediriger vers la page de connexion
+				window.location.href = '/connexion';
+				return;
+			}
+
 			// Récupérer le nom personnalisé
 			const pairNameInput = document.getElementById('pair-name') as HTMLInputElement;
 			const nomPersonnalisation = pairNameInput?.value?.trim() || '';
