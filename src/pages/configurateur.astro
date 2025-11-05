@@ -34,7 +34,7 @@ import ChevronSvg from '../assets/chevron.svg?raw';
 					✏️ MODE ÉDITION
 				</div>
 				<h1 class="text-2xl font-bold tracking-wide m-0 model-title" style="font-family: var(--font-title);">NOM DE VOTRE PAIRE</h1>
-			</div>				<button class="flex items-center gap-2 px-6 py-3 bg-white text-black border-2 border-black rounded-full text-xs font-semibold tracking-wider hover:bg-black hover:text-white transition-all">
+			</div>				<button class="reinitialiser-btn flex items-center gap-2 px-6 py-3 bg-white text-black border-2 border-black rounded-full text-xs font-semibold tracking-wider hover:bg-black hover:text-white transition-all">
 					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
 						<path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
 					</svg>
@@ -588,23 +588,76 @@ import ChevronSvg from '../assets/chevron.svg?raw';
 			case: 'soft',
 			price: 146,
 			lunetteId: null
-		};			// Réinitialiser l'interface
-			updateGlassesSize(0);
-			updateLensType('clear');
-			updateFrameColor('#1D1D1B');
-			updateTempleColor('#1D1D1B');
+		};
+		
+		// Réinitialiser l'interface
+		updateGlassesSize(0);
+		updateLensType('clear');
+		updateFrameColor('#1D1D1B');
+		updateTempleColor('#1D1D1B');
 
-			// Réinitialiser les boutons actifs
-			document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
-			
-			// Réinitialiser le nom
-			const pairNameInput = document.getElementById('pair-name') as HTMLInputElement;
-			if (pairNameInput) {
-				pairNameInput.value = '';
-			}
-			
-			alert('Configuration réinitialisée!');
-		});
+		// Réinitialiser tous les boutons actifs
+		document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
+		document.querySelectorAll('.case-btn').forEach(b => b.classList.remove('active'));
+		
+		// Réinitialiser les radio buttons des verres
+		const clearLensRadio = document.querySelector('input[name="lenses"][value="clear"]') as HTMLInputElement;
+		if (clearLensRadio) {
+			clearLensRadio.checked = true;
+		}
+		
+		// Réinitialiser le nom
+		const pairNameInput = document.getElementById('pair-name') as HTMLInputElement;
+		if (pairNameInput) {
+			pairNameInput.value = '';
+		}
+		
+		// Réinitialiser le titre
+		const modelTitle = document.querySelector('.model-title');
+		if (modelTitle) {
+			modelTitle.textContent = 'NOM DE VOTRE PAIRE';
+		}
+		
+		// Réinitialiser le localStorage
+		localStorage.removeItem('pair-name');
+		localStorage.removeItem('glasses-config');
+		
+		// Masquer les badges
+		const cerclesBadge = document.getElementById('cercles-badge');
+		const branchesBadge = document.getElementById('branches-badge');
+		const editBadge = document.getElementById('edit-mode-badge');
+		
+		if (cerclesBadge) {
+			cerclesBadge.classList.add('hidden');
+			cerclesBadge.classList.remove('flex');
+		}
+		if (branchesBadge) {
+			branchesBadge.classList.add('hidden');
+			branchesBadge.classList.remove('flex');
+		}
+		if (editBadge) {
+			editBadge.classList.add('hidden');
+			editBadge.classList.remove('inline-block');
+		}
+		
+		// Réinitialiser le prix
+		const priceDisplay = document.getElementById('price-display');
+		if (priceDisplay) {
+			priceDisplay.textContent = '146 €';
+		}
+		
+		// Réinitialiser le texte du bouton sauvegarder
+		const saveBtn = document.querySelector('.save-btn');
+		if (saveBtn) {
+			saveBtn.textContent = 'ENREGISTRER';
+		}
+		
+		// Réinitialiser le carousel
+		currentSlide = 0;
+		updateCarousel();
+		
+		console.log('✅ Configuration complètement réinitialisée');
+	});
 
 		// ===== BOUTON CHANGER DE MODÈLE =====
 		document.querySelector('.change-model-btn')?.addEventListener('click', () => {
