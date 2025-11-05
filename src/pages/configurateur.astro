@@ -178,23 +178,26 @@ import ChevronSvg from '../assets/chevron.svg?raw';
 				<div id="step-3" class="border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-shadow scroll-mt-24">
 					<div class="flex items-center justify-between px-6 py-4 bg-white cursor-pointer hover:bg-gray-50 transition-colors">
 						<span class="font-semibold tracking-wide text-lg" style="font-family: var(--font-subtitle);">3. CERCLES</span>
+						<div id="cercles-badge" class="hidden items-center gap-2 bg-black text-white px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap">
+							<span style="font-family: var(--font-body);">LE MODÈLE LE PLUS CHOISI PAR NOTRE COMMUNAUTÉ</span>
+						</div>
 					</div>
 					<div class="px-6 py-6 bg-gray-50 border-t border-gray-200">
 						<div class="grid grid-cols-4 gap-6">
-							<button class="color-btn flex flex-col items-center gap-3 cursor-pointer transition-all hover:scale-105" data-color="#f5f5f5" title="Blanc">
+							<button class="color-btn flex flex-col items-center gap-3 cursor-pointer transition-all hover:scale-105" data-color="#f5f5f5" data-favorite="false" title="Blanc">
 								<div class="w-full aspect-square border border-gray-200 rounded-lg" style="background-color: #f5f5f5;"></div>
 								<span class="text-sm" style="font-family: var(--font-body);">Blanc</span>
 							</button>
-							<button class="color-btn flex flex-col items-center gap-3 cursor-pointer transition-all hover:scale-105 relative" data-color="#000000" title="Noir">
-								<span class="absolute -top-4 right-1 text-yellow-400 text-2xl">★</span>
+							<button class="color-btn flex flex-col items-center gap-3 cursor-pointer transition-all hover:scale-105 relative" data-color="#000000" data-favorite="true" title="Noir">
+								<span class="absolute -top-6 right-0 text-yellow-400 text-4xl">★</span>
 								<div class="w-full aspect-square border border-gray-200 rounded-lg" style="background-color: #000000;"></div>
 								<span class="text-sm" style="font-family: var(--font-body);">Noir</span>
 							</button>
-							<button class="color-btn flex flex-col items-center gap-3 cursor-pointer transition-all hover:scale-105 relative" data-color="#f4c542" title="Or">
+							<button class="color-btn flex flex-col items-center gap-3 cursor-pointer transition-all hover:scale-105 relative" data-color="#f4c542" data-favorite="false" title="Or">
 								<div class="w-full aspect-square border border-gray-200 rounded-lg" style="background-color: #f4c542;"></div>
 								<span class="text-sm" style="font-family: var(--font-body);">Or</span>
 							</button>
-							<button class="color-btn flex flex-col items-center gap-3 cursor-pointer transition-all hover:scale-105" data-color="#e6b8a8" title="Cuivre Brillant">
+							<button class="color-btn flex flex-col items-center gap-3 cursor-pointer transition-all hover:scale-105" data-color="#e6b8a8" data-favorite="false" title="Cuivre Brillant">
 								<div class="w-full aspect-square border border-gray-200 rounded-lg" style="background-color: #e6b8a8;"></div>
 								<span class="text-sm" style="font-family: var(--font-body);">Cuivre Brillant</span>
 							</button>
@@ -206,27 +209,30 @@ import ChevronSvg from '../assets/chevron.svg?raw';
 				<div id="step-4" class="border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-shadow scroll-mt-24">
 					<div class="flex items-center justify-between px-6 py-4 bg-white cursor-pointer hover:bg-gray-50 transition-colors">
 						<span class="font-semibold tracking-wide text-lg" style="font-family: var(--font-subtitle);">4. BRANCHES</span>
+						<div id="branches-badge" class="hidden items-center gap-2 bg-black text-white px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap">
+							<span style="font-family: var(--font-body);">LE MODÈLE LE PLUS CHOISI PAR NOTRE COMMUNAUTÉ</span>
+						</div>
 					</div>
 					<div class="px-6 py-6 bg-gray-50 border-t border-gray-200">
 						<div class="grid grid-cols-4 gap-6">
-							<button class="color-btn flex flex-col items-center gap-3 cursor-pointer transition-all hover:scale-105" data-color="transparent" data-part="temples" title="Transparent">
+							<button class="color-btn flex flex-col items-center gap-3 cursor-pointer transition-all hover:scale-105" data-color="transparent" data-part="temples" data-favorite="false" title="Transparent">
 								<div class="w-full aspect-square border border-gray-200 rounded-lg bg-white"></div>
 								<span class="text-sm" style="font-family: var(--font-body);">Transparent</span>
 							</button>
-							<button class="color-btn flex flex-col items-center gap-3 cursor-pointer transition-all hover:scale-105" data-color="#92400e" data-part="temples" title="Havane">
+							<button class="color-btn flex flex-col items-center gap-3 cursor-pointer transition-all hover:scale-105" data-color="#92400e" data-part="temples" data-favorite="false" title="Havane">
 								<div class="w-full aspect-square border border-gray-200 rounded-lg overflow-hidden">
 									<img src={HavaneImg.src} alt="Havane" class="w-full h-full object-cover" />
 								</div>
 								<span class="text-sm" style="font-family: var(--font-body);">Havane</span>
 							</button>
 							<div class="flex flex-col items-center gap-3 relative">
-								<span class="absolute -top-4 right-1 text-yellow-400 text-2xl">★</span>
-								<button class="color-btn w-full cursor-pointer transition-all hover:scale-105" data-color="#000000" data-part="temples" title="Noir">
+								<span class="absolute -top-6 right-0 text-yellow-400 text-4xl">★</span>
+								<button class="color-btn w-full cursor-pointer transition-all hover:scale-105" data-color="#000000" data-part="temples" data-favorite="true" title="Noir">
 									<div class="w-full aspect-square border border-gray-200 rounded-lg" style="background-color: #000000;"></div>
 								</button>
 								<span class="text-sm" style="font-family: var(--font-body);">Noir</span>
 							</div>
-							<button class="color-btn flex flex-col items-center gap-3 cursor-pointer transition-all hover:scale-105" data-color="#ffffff" data-part="temples" title="Blanc">
+							<button class="color-btn flex flex-col items-center gap-3 cursor-pointer transition-all hover:scale-105" data-color="#ffffff" data-part="temples" data-favorite="false" title="Blanc">
 								<div class="w-full aspect-square border border-gray-200 rounded-lg" style="background-color: #ffffff;"></div>
 								<span class="text-sm" style="font-family: var(--font-body);">Blanc</span>
 							</button>
@@ -260,11 +266,11 @@ import ChevronSvg from '../assets/chevron.svg?raw';
 
 			<!-- Footer avec prix -->
 			<div class="sticky bottom-0 bg-[#2A2017] px-8 py-6">
-				<div class="flex items-center justify-between gap-6 flex-wrap">
+				<div class="flex items-center gap-4 flex-wrap">
 					<button class="w-12 h-12 bg-transparent border-0 flex items-center justify-center text-white text-2xl hover:opacity-70 transition-all cursor-pointer" aria-label="Retour">
 						<span set:html={ChevronSvg}></span>
 					</button>
-					<span class="text-3xl font-bold text-white" style="font-family: var(--font-title);">146 €</span>
+					<span class="text-3xl font-bold text-white mr-auto" style="font-family: var(--font-title);">146 €</span>
 					<button class="px-8 py-3 bg-white text-black rounded-full text-sm font-semibold tracking-wider hover:bg-gray-100 transition-all whitespace-nowrap" style="font-family: var(--font-body);">
 						ENREGISTRER
 					</button>
@@ -290,15 +296,16 @@ import ChevronSvg from '../assets/chevron.svg?raw';
 		background-color: #2d2d2d !important;
 	}
 
-	.color-btn.active {
+	.color-btn.active > div {
 		border-width: 3px !important;
 		border-color: black !important;
-		box-shadow: 0 0 0 2px white, 0 0 0 4px black !important;
+		border-radius: 0.5rem !important;
 	}
 
-	.case-btn.active {
+	.case-btn.active > div {
 		border-width: 3px !important;
 		border-color: black !important;
+		border-radius: 0.5rem !important;
 	}
 </style>
 
@@ -423,16 +430,29 @@ import ChevronSvg from '../assets/chevron.svg?raw';
 		});
 
 		// ===== GESTION DES COULEURS DE CERCLES =====
+		const cerclesBadge = document.getElementById('cercles-badge');
 		document.querySelectorAll('.color-btn[data-color]:not([data-part])').forEach(btn => {
 			btn.addEventListener('click', (e) => {
 				const target = e.currentTarget as HTMLElement;
 				const color = target.getAttribute('data-color');
+				const isFavorite = target.getAttribute('data-favorite') === 'true';
 				if (!color) return;
 
+				// Mettre à jour le badge
+				if (cerclesBadge) {
+					if (isFavorite) {
+						cerclesBadge.classList.remove('hidden');
+						cerclesBadge.classList.add('flex');
+					} else {
+						cerclesBadge.classList.add('hidden');
+						cerclesBadge.classList.remove('flex');
+					}
+				}
+
 				// Mise à jour de l'état actif dans la section cercles
-				const parent = target.closest('.config-step');
-				if (parent && parent.querySelector('.step-number')?.textContent?.includes('CERCLES')) {
-					parent.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
+				const section = target.closest('#step-3');
+				if (section) {
+					section.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
 					target.classList.add('active');
 					updateFrameColor(color);
 				}
@@ -440,16 +460,29 @@ import ChevronSvg from '../assets/chevron.svg?raw';
 		});
 
 		// ===== GESTION DES COULEURS DE BRANCHES =====
+		const branchesBadge = document.getElementById('branches-badge');
 		document.querySelectorAll('.color-btn[data-part="temples"]').forEach(btn => {
 			btn.addEventListener('click', (e) => {
 				const target = e.currentTarget as HTMLElement;
 				const color = target.getAttribute('data-color');
+				const isFavorite = target.getAttribute('data-favorite') === 'true';
 				if (!color) return;
 
+				// Mettre à jour le badge
+				if (branchesBadge) {
+					if (isFavorite) {
+						branchesBadge.classList.remove('hidden');
+						branchesBadge.classList.add('flex');
+					} else {
+						branchesBadge.classList.add('hidden');
+						branchesBadge.classList.remove('flex');
+					}
+				}
+
 				// Mise à jour de l'état actif dans la section branches
-				const parent = target.closest('.config-step');
-				if (parent && parent.querySelector('.step-number')?.textContent?.includes('BRANCHES')) {
-					parent.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
+				const section = target.closest('#step-4');
+				if (section) {
+					section.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
 					target.classList.add('active');
 					updateTempleColor(color);
 				}
