@@ -1,0 +1,129 @@
+---
+interface Props {
+  id: string;
+  nom_modele: string;
+  nom_personnalisation: string;
+  taille: number;
+  prix: number;
+  image?: string;
+  verres?: string;
+  cercles?: string;
+  branche?: string;
+}
+
+const { 
+  id, 
+  nom_modele, 
+  nom_personnalisation, 
+  taille, 
+  prix, 
+  image,
+  verres,
+  cercles,
+  branche
+} = Astro.props;
+
+// Badge de personnalisation si le modèle est personnalisé
+const hasCustomization = nom_personnalisation && nom_personnalisation.trim() !== '';
+---
+
+<a 
+  href={`/lunette/${id}`} 
+  class="block relative bg-gray-100 rounded-lg overflow-hidden border border-gray-200 transition-all duration-200 no-underline text-inherit h-full hover:shadow-md"
+>
+  <!-- Badge -->
+  <div class="absolute top-3 left-3 bg-[#2A2017] text-white px-3 py-1.5 rounded text-[0.625rem] font-bold tracking-wide uppercase z-10">
+    {hasCustomization ? 'MODIFIÉ' : 'STANDARD'}
+  </div>
+  
+  <!-- Image Section -->
+  <div class="w-full h-[200px] bg-white flex items-center justify-center overflow-hidden">
+    {image ? (
+      <img src={image} alt={nom_personnalisation || nom_modele} class="w-full h-full object-contain p-5" />
+    ) : (
+      <svg viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg" class="w-3/5 h-auto text-gray-300">
+        <g stroke="currentColor" stroke-width="2" fill="none">
+          <circle cx="50" cy="40" r="25" />
+          <circle cx="150" cy="40" r="25" />
+          <line x1="75" y1="40" x2="125" y2="40" />
+          <line x1="25" y1="40" x2="10" y2="35" />
+          <line x1="175" y1="40" x2="190" y2="35" />
+        </g>
+      </svg>
+    )}
+  </div>
+  
+  <!-- Content Section -->
+  <div class="p-4">
+    <h3 class="font-body text-lg font-semibold text-[#2A2017] m-0 mb-1 overflow-hidden text-ellipsis whitespace-nowrap">
+      {nom_personnalisation || nom_modele}
+    </h3>
+    <p class="font-subtitle text-xs text-gray-600 m-0 mb-3 uppercase tracking-wider">
+      Modèle {nom_modele}
+    </p>
+    
+    <!-- Details -->
+    <div class="flex flex-col gap-0.5 mb-4 text-xs text-gray-700">
+      {taille && <span class="font-body leading-relaxed">• Taille {taille}</span>}
+      {verres && <span class="font-body leading-relaxed">• Verres de {verres}</span>}
+      {cercles && <span class="font-body leading-relaxed">• {cercles}</span>}
+    </div>
+    
+    <!-- Footer: Price + Actions -->
+    <div class="flex justify-between items-center pt-3 border-t border-gray-200">
+      <span class="font-body text-xl font-bold text-[#2A2017]">{prix} €</span>
+      
+      <div class="flex gap-1.5">
+        <button 
+          class="action-btn bg-transparent border border-gray-300 rounded p-1.5 cursor-pointer transition-all duration-200 text-gray-600 flex items-center justify-center hover:bg-gray-200 hover:border-gray-400 hover:text-black" 
+          aria-label="Voir les détails"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+        </button>
+        <button 
+          class="action-btn copy-btn bg-transparent border border-gray-300 rounded p-1.5 cursor-pointer transition-all duration-200 text-gray-600 flex items-center justify-center hover:bg-gray-200 hover:border-gray-400 hover:text-black" 
+          aria-label="Copier"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+        </button>
+        <button 
+          class="action-btn delete-btn bg-transparent border border-gray-300 rounded p-1.5 cursor-pointer transition-all duration-200 text-gray-600 flex items-center justify-center hover:bg-[#2A2017] hover:border-[#2A2017] hover:text-white" 
+          aria-label="Supprimer"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</a>
+
+<style>
+  /* Prevent hover effects on card when clicking buttons */
+  .action-btn {
+    position: relative;
+    z-index: 20;
+  }
+</style>
+
+<script>
+  // Empêcher la navigation quand on clique sur les boutons d'action
+  document.querySelectorAll('.action-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      // Ici vous pouvez ajouter la logique pour chaque bouton
+      const action = btn.getAttribute('aria-label');
+      console.log('Action:', action);
+    });
+  });
+</script>

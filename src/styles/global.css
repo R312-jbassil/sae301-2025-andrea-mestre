@@ -22,6 +22,11 @@
   --color-accent-dark: #d97706;
   --color-accent-light: #fbbf24;
   
+  /* Couleurs brand pour Tailwind */
+  --color-brand-brown: #2A2017;
+  --color-brand-dark: #1f2937;
+  --color-brand-light: #f5f5f5;
+  
   /* Couleurs de matériaux pour lunettes */
   --color-frame-black: #1f2937;
   --color-frame-tortoise: #92400e;
@@ -30,6 +35,11 @@
   --color-frame-gold: #ca8a04;
   --color-frame-silver: #71717a;
   --color-frame-transparent: #f3f4f6;
+  
+  /* Couleurs UI/Branding */
+  --color-brand-brown: #2A2017; /* Marron principal pour la charte */
+  --color-brand-dark: #1f2937; /* Gris foncé/noir */
+  --color-brand-light: #f5f5f5; /* Gris très clair pour backgrounds */
   
   /* Couleurs verres */
   --color-lens-clear: rgba(255, 255, 255, 0.1);
@@ -43,6 +53,12 @@
   --font-subtitle: 'Courier Prime', monospace; /* Pour subtitle */
   --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif; /* Pour le texte général */
   --font-btn: 'Inter', ui-sans-serif, system-ui, sans-serif; /* Pour les boutons */
+  
+  /* Font families for Tailwind */
+  --font-family-title: 'Courier Prime', monospace;
+  --font-family-subtitle: 'Courier Prime', monospace;
+  --font-family-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-family-btn: 'Inter', ui-sans-serif, system-ui, sans-serif;
   
   /* Tailles de police - basées sur votre Figma */
   /* title_1 : Inter Regular 48 / -5% */
@@ -91,6 +107,25 @@
   --screen-lg: 1024px;
   --screen-xl: 1280px;
   --screen-2xl: 1536px;
+}
+
+/* ===== UTILITIES PERSONNALISÉES ===== */
+@layer utilities {
+  .font-title {
+    font-family: var(--font-family-title);
+  }
+  
+  .font-subtitle {
+    font-family: var(--font-family-subtitle);
+  }
+  
+  .font-body {
+    font-family: var(--font-family-body);
+  }
+  
+  .font-btn {
+    font-family: var(--font-family-btn);
+  }
 }
 
 /* ===== STYLES GLOBAUX ===== */

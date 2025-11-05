@@ -22,18 +22,19 @@ import ChevronSvg from '../assets/chevron.svg?raw';
 		<section class="flex flex-col bg-gray-100 border-r border-gray-200 p-8">
 			<!-- Header avec retour et titre -->
 			<div class="flex items-center justify-between gap-4 mb-8 flex-wrap">
-				<a href="/" class="flex items-center gap-2 px-6 py-3 bg-[#2d2d2d] text-white rounded-lg text-xs font-semibold tracking-wider hover:bg-black transition-all no-underline">
-					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-						<path d="M19 12H5M12 19l-7-7 7-7"/>
-					</svg>
-					RETOUR
-				</a>
-				
-				<div class="flex-1 text-center">
-					<h1 class="text-2xl font-bold tracking-wide m-0" style="font-family: var(--font-title);">NOM DE VOTRE PAIRE</h1>
+			<a href="/" class="flex items-center gap-2 px-6 py-3 bg-[#2d2d2d] text-white rounded-lg text-xs font-semibold tracking-wider hover:bg-black transition-all no-underline">
+				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+					<path d="M19 12H5M12 19l-7-7 7-7"/>
+				</svg>
+				RETOUR
+			</a>
+			
+			<div class="flex-1 text-center">
+				<div id="edit-mode-badge" class="hidden px-3 py-1 bg-orange-500 text-white text-xs font-bold rounded-full mb-2">
+					✏️ MODE ÉDITION
 				</div>
-				
-				<button class="flex items-center gap-2 px-6 py-3 bg-white text-black border-2 border-black rounded-full text-xs font-semibold tracking-wider hover:bg-black hover:text-white transition-all">
+				<h1 class="text-2xl font-bold tracking-wide m-0 model-title" style="font-family: var(--font-title);">NOM DE VOTRE PAIRE</h1>
+			</div>				<button class="flex items-center gap-2 px-6 py-3 bg-white text-black border-2 border-black rounded-full text-xs font-semibold tracking-wider hover:bg-black hover:text-white transition-all">
 					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
 						<path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
 					</svg>
@@ -264,21 +265,21 @@ import ChevronSvg from '../assets/chevron.svg?raw';
 				</div>
 			</div>
 
-			<!-- Footer avec prix -->
-			<div class="sticky bottom-0 bg-[#2A2017] px-8 py-6">
-				<div class="flex items-center gap-4 flex-wrap">
-					<button class="w-12 h-12 bg-transparent border-0 flex items-center justify-center text-white text-2xl hover:opacity-70 transition-all cursor-pointer" aria-label="Retour">
-						<span set:html={ChevronSvg}></span>
-					</button>
-					<span class="text-3xl font-bold text-white mr-auto" style="font-family: var(--font-title);">146 €</span>
-					<button class="px-8 py-3 bg-white text-black rounded-full text-sm font-semibold tracking-wider hover:bg-gray-100 transition-all whitespace-nowrap" style="font-family: var(--font-body);">
-						ENREGISTRER
-					</button>
-					<button class="px-8 py-3 bg-white text-black rounded-full text-sm font-semibold tracking-wider hover:bg-gray-100 transition-all whitespace-nowrap" style="font-family: var(--font-body);">
-						AJOUTER AU PANIER
-					</button>
-				</div>
+		<!-- Footer avec prix -->
+		<div class="sticky bottom-0 bg-[#2A2017] px-8 py-6">
+			<div class="flex items-center gap-4 flex-wrap">
+				<button class="w-12 h-12 bg-transparent border-0 flex items-center justify-center text-white text-2xl hover:opacity-70 transition-all cursor-pointer" aria-label="Retour">
+					<span set:html={ChevronSvg}></span>
+				</button>
+				<span id="price-display" class="text-3xl font-bold text-white mr-auto" style="font-family: var(--font-title);">146 €</span>
+				<button class="save-btn px-8 py-3 bg-white text-black rounded-full text-sm font-semibold tracking-wider hover:bg-gray-100 transition-all whitespace-nowrap" style="font-family: var(--font-body);">
+					ENREGISTRER
+				</button>
+				<button class="add-to-cart-btn px-8 py-3 bg-white text-black rounded-full text-sm font-semibold tracking-wider hover:bg-gray-100 transition-all whitespace-nowrap" style="font-family: var(--font-body);">
+					AJOUTER AU PANIER
+				</button>
 			</div>
+		</div>
 		</section>
 	</main>
 </Layout>
@@ -310,18 +311,79 @@ import ChevronSvg from '../assets/chevron.svg?raw';
 </style>
 
 <script>
+	import { createLunette, updateLunette, getLunette, type LunetteData } from '../utils/pb';
+
 	// ===== GESTION DES INTERACTIONS =====
 	
 	// État de la configuration
 	let config = {
+		nom_modele: 'WAYFARER',
+		nom_personnalisation: '',
 		size: 'S',
 		sizeIndex: 0,
+		sizeValue: '60-18',
 		lenses: 'clear',
 		frameColor: '#1D1D1B',
 		templeColor: '#1D1D1B',
 		case: 'soft',
-		price: 146
+		price: 146,
+		lunetteId: null as string | null // Pour stocker l'ID si on édite une lunette existante
 	};
+
+	// ===== MODE ÉDITION : Charger une lunette existante =====
+	async function loadLunetteForEdit() {
+		// Récupérer le paramètre ?edit=id depuis l'URL
+		const urlParams = new URLSearchParams(window.location.search);
+		const editId = urlParams.get('edit');
+
+		if (editId) {
+			try {
+				console.log('🔄 Chargement de la lunette pour édition:', editId);
+				const result = await getLunette(editId);
+				
+				if (result.success && result.data) {
+					const lunette = result.data;
+					
+					// Stocker l'ID pour la mise à jour
+					config.lunetteId = lunette.id;
+					
+					// Charger les données dans config
+					config.nom_modele = lunette.nom_modele || 'WAYFARER';
+					config.nom_personnalisation = lunette.nom_personnalisation || '';
+					config.price = lunette.prix || 146;
+					config.lenses = lunette.verres || 'clear';
+					config.frameColor = lunette.cercles || '#1D1D1B';
+					config.templeColor = lunette.branches || '#1D1D1B';
+					config.case = lunette.etui || 'soft';
+					
+					// Gérer la taille
+					if (lunette.taille) {
+						const sizeIndex = sizes.findIndex(s => parseInt(s.value.split('-')[0]) === lunette.taille);
+						if (sizeIndex !== -1) {
+							config.sizeIndex = sizeIndex;
+							config.sizeValue = sizes[sizeIndex].value;
+						}
+					}
+					
+					console.log('✅ Lunette chargée:', config);
+					
+					// Appliquer les valeurs chargées à l'interface (sera appelé dans DOMContentLoaded)
+					if (document.readyState === 'loading') {
+						// Le DOM n'est pas encore prêt, applyLoadedConfig sera appelé plus tard
+					} else {
+						// Le DOM est déjà prêt, appliquer immédiatement
+						// Note: applyLoadedConfig est défini dans DOMContentLoaded
+					}
+				} else {
+					console.error('❌ Erreur lors du chargement:', result.error);
+					alert('Erreur lors du chargement de la lunette.');
+				}
+			} catch (error) {
+				console.error('❌ Erreur:', error);
+				alert('Impossible de charger la lunette.');
+			}
+		}
+	}
 
 	// Tailles disponibles
 	const sizes = [
@@ -348,15 +410,14 @@ import ChevronSvg from '../assets/chevron.svg?raw';
 		const strokePaths = svg.querySelectorAll('path[stroke="#1D1D1B"]');
 
 		// ===== FONCTIONS DE MISE À JOUR DU SVG =====
-		function updateGlassesSize(sizeIndex: number) {
-			config.sizeIndex = sizeIndex;
+	function updateGlassesSize(sizeIndex: number) {
+		config.sizeIndex = sizeIndex;
+		config.sizeValue = sizes[sizeIndex].value;
 
-			// Mettre à jour uniquement l'affichage de la valeur
-			const sizeValue = document.getElementById('size-value');
-			if (sizeValue) sizeValue.textContent = sizes[sizeIndex].value;
-		}
-
-		function updateLensType(type: string) {
+		// Mettre à jour uniquement l'affichage de la valeur
+		const sizeValue = document.getElementById('size-value');
+		if (sizeValue) sizeValue.textContent = config.sizeValue;
+	}		function updateLensType(type: string) {
 			if (!framePaths || framePaths.length === 0) return;
 
 			const lensStyles = {
@@ -512,20 +573,22 @@ import ChevronSvg from '../assets/chevron.svg?raw';
 			});
 		});
 
-		// ===== BOUTON RÉINITIALISER =====
-		document.querySelector('.reinitialiser-btn')?.addEventListener('click', () => {
-			// Réinitialiser la configuration
-			config = {
-				size: 'S',
-				sizeIndex: 0,
-				lenses: 'clear',
-				frameColor: '#1D1D1B',
-				templeColor: '#1D1D1B',
-				case: 'soft',
-				price: 146
-			};
-
-			// Réinitialiser l'interface
+	// ===== BOUTON RÉINITIALISER =====
+	document.querySelector('.reinitialiser-btn')?.addEventListener('click', () => {
+		// Réinitialiser la configuration
+		config = {
+			nom_modele: 'WAYFARER',
+			nom_personnalisation: '',
+			size: 'S',
+			sizeIndex: 0,
+			sizeValue: '60-18',
+			lenses: 'clear',
+			frameColor: '#1D1D1B',
+			templeColor: '#1D1D1B',
+			case: 'soft',
+			price: 146,
+			lunetteId: null
+		};			// Réinitialiser l'interface
 			updateGlassesSize(0);
 			updateLensType('clear');
 			updateFrameColor('#1D1D1B');
@@ -549,25 +612,26 @@ import ChevronSvg from '../assets/chevron.svg?raw';
 			window.location.href = '/modeles';
 		});
 
-		// ===== INPUT NOM DE LA PAIRE =====
-		const pairNameInput = document.getElementById('pair-name') as HTMLInputElement;
-		pairNameInput?.addEventListener('input', (e) => {
-			const target = e.target as HTMLInputElement;
-			const pairName = target.value;
-			
-			// Mettre à jour le titre si vous voulez afficher le nom en temps réel
-			const modelTitle = document.querySelector('.model-title h1');
-			if (modelTitle && pairName.trim()) {
-				modelTitle.textContent = pairName.toUpperCase();
-			} else if (modelTitle) {
-				modelTitle.textContent = 'NOM DE VOTRE PAIRE';
-			}
-			
-			// Sauvegarder dans la config
-			localStorage.setItem('pair-name', pairName);
-		});
-
-		// Charger le nom sauvegardé au chargement
+	// ===== INPUT NOM DE LA PAIRE =====
+	const pairNameInput = document.getElementById('pair-name') as HTMLInputElement;
+	pairNameInput?.addEventListener('input', (e) => {
+		const target = e.target as HTMLInputElement;
+		const pairName = target.value;
+		
+		// Mettre à jour le config
+		config.nom_personnalisation = pairName;
+		
+		// Mettre à jour le titre si vous voulez afficher le nom en temps réel
+		const modelTitle = document.querySelector('.model-title h1');
+		if (modelTitle && pairName.trim()) {
+			modelTitle.textContent = pairName.toUpperCase();
+		} else if (modelTitle) {
+			modelTitle.textContent = 'NOM DE VOTRE PAIRE';
+		}
+		
+		// Sauvegarder dans la config
+		localStorage.setItem('pair-name', pairName);
+	});		// Charger le nom sauvegardé au chargement
 		const savedName = localStorage.getItem('pair-name');
 		if (savedName && pairNameInput) {
 			pairNameInput.value = savedName;
@@ -577,18 +641,58 @@ import ChevronSvg from '../assets/chevron.svg?raw';
 			}
 		}
 
-		// ===== BOUTON SAUVEGARDER =====
-		document.querySelector('.save-btn')?.addEventListener('click', () => {
-			const configData = JSON.stringify(config, null, 2);
-			console.log('Configuration sauvegardée:', configData);
-			
-			// Option: sauvegarder en localStorage
-			localStorage.setItem('glasses-config', configData);
-			
-			alert('Configuration sauvegardée avec succès!');
-		});
+	// ===== BOUTON SAUVEGARDER =====
+	document.querySelector('.save-btn')?.addEventListener('click', async () => {
+		try {
+			// Récupérer le nom personnalisé
+			const pairNameInput = document.getElementById('pair-name') as HTMLInputElement;
+			const nomPersonnalisation = pairNameInput?.value?.trim() || '';
 
-		// ===== BOUTON AJOUTER AU PANIER =====
+			// Extraire le numéro de taille (ex: "60-18" -> 60)
+			const tailleNumber = parseInt(config.sizeValue.split('-')[0]);
+
+			// Mapper les valeurs vers le schéma PocketBase
+			const lunetteData: LunetteData = {
+				nom_modele: config.nom_modele,
+				nom_personnalisation: nomPersonnalisation || `${config.nom_modele} - ${new Date().toLocaleDateString()}`,
+				prix: config.price,
+				description: `Verres: ${config.lenses}, Cercles: ${config.frameColor}, Branches: ${config.templeColor}, Étui: ${config.case}`,
+				taille: tailleNumber,
+				verres: config.lenses,
+				cercles: config.frameColor,
+				branches: config.templeColor,
+				etui: config.case,
+				origine_lunette: 'configurateur'
+			};
+
+		// Sauvegarder dans PocketBase
+		if (config.lunetteId) {
+			// Mise à jour si l'ID existe
+			const result = await updateLunette(config.lunetteId, lunetteData);
+			if (result.success) {
+				alert('✅ Configuration mise à jour avec succès!');
+			} else {
+				throw new Error(result.error);
+			}
+		} else {
+			// Création d'une nouvelle entrée
+			const result = await createLunette(lunetteData);
+			if (result.success && result.data) {
+				config.lunetteId = result.data.id;
+				alert('✅ Configuration sauvegardée avec succès!');
+			} else {
+				throw new Error(result.error);
+			}
+		}			console.log('✅ Sauvegardé dans PocketBase:', lunetteData);
+
+			// Optionnel: sauvegarder aussi en localStorage comme backup
+			localStorage.setItem('glasses-config', JSON.stringify(config));
+
+		} catch (error) {
+			console.error('❌ Erreur lors de la sauvegarde:', error);
+			alert('❌ Erreur lors de la sauvegarde. Veuillez réessayer.');
+		}
+	});		// ===== BOUTON AJOUTER AU PANIER =====
 		document.querySelector('.add-to-cart-btn')?.addEventListener('click', () => {
 			console.log('Ajout au panier:', config);
 			alert('Article ajouté au panier!');
@@ -688,10 +792,82 @@ import ChevronSvg from '../assets/chevron.svg?raw';
 			observer.observe(step);
 		});
 
-		// Initialisation
+		// ===== FONCTION POUR APPLIQUER LA CONFIG CHARGÉE =====
+		function applyLoadedConfig() {
+			// Mettre à jour l'input du nom
+			const pairNameInput = document.getElementById('pair-name') as HTMLInputElement;
+			if (pairNameInput) {
+				pairNameInput.value = config.nom_personnalisation;
+			}
+			
+			// Mettre à jour le titre
+			const modelTitle = document.querySelector('.model-title h1');
+			if (modelTitle && config.nom_personnalisation) {
+				modelTitle.textContent = config.nom_personnalisation.toUpperCase();
+			}
+			
+			// Appliquer les valeurs au SVG et à l'interface
+			updateGlassesSize(config.sizeIndex);
+			updateLensType(config.lenses);
+			updateFrameColor(config.frameColor);
+			updateTempleColor(config.templeColor);
+			
+			// Mettre à jour l'étui sélectionné
+			document.querySelectorAll('[data-case]').forEach(btn => {
+				const caseType = btn.getAttribute('data-case');
+				if (caseType === config.case) {
+					btn.classList.add('active');
+				} else {
+					btn.classList.remove('active');
+				}
+			});
+			
+			// Mettre à jour les boutons de couleur actifs
+			document.querySelectorAll('[data-frame-color]').forEach(btn => {
+				const color = btn.getAttribute('data-frame-color');
+				if (color === config.frameColor) {
+					btn.classList.add('active');
+				} else {
+					btn.classList.remove('active');
+				}
+			});
+			
+			document.querySelectorAll('[data-temple-color]').forEach(btn => {
+				const color = btn.getAttribute('data-temple-color');
+				if (color === config.templeColor) {
+					btn.classList.add('active');
+				} else {
+					btn.classList.remove('active');
+				}
+			});
+			
+		// Mettre à jour le prix affiché
+		const priceDisplay = document.getElementById('price-display');
+		if (priceDisplay) {
+			priceDisplay.textContent = `${config.price} €`;
+		}
+		
+		// Afficher le badge MODE ÉDITION
+		const editBadge = document.getElementById('edit-mode-badge');
+		if (editBadge && config.lunetteId) {
+			editBadge.classList.remove('hidden');
+			editBadge.classList.add('inline-block');
+		}
+		
+		// Changer le texte du bouton "ENREGISTRER" → "ENREGISTRER LES MODIFICATIONS"
+		const saveBtn = document.querySelector('.save-btn');
+		if (saveBtn && config.lunetteId) {
+			saveBtn.textContent = 'ENREGISTRER LES MODIFICATIONS';
+		}
+		
+		console.log('✅ Interface mise à jour avec les données chargées');
+	}		// Initialisation
 		updateLensType('clear');
 		updateFrameColor('#1D1D1B');
 		updateTempleColor('#1D1D1B');
 		updateGlassesSize(0);
+
+		// ===== CHARGER UNE LUNETTE EN MODE ÉDITION =====
+		loadLunetteForEdit();
 	});
 </script>

@@ -1,0 +1,199 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import LunetteCard from '../components/LunetteCard.astro';
+import pb from '../utils/pb';
+
+// Récupération de toutes les lunettes depuis PocketBase
+let lunettes: any[] = [];
+let error = '';
+
+try {
+  // Récupérer toutes les lunettes de la collection
+  const resultList = await pb.collection('lunette').getList(1, 50, {
+    sort: '-created', // Trier par date de création (plus récent en premier)
+  });
+  lunettes = resultList.items;
+} catch (e: any) {
+  console.error('Erreur lors de la récupération des lunettes:', e);
+  error = e.message;
+}
+---
+
+<Layout title="Ma Galerie - TAVUE">
+  <Header />
+  
+  <main class="max-w-[1400px] mx-auto px-10 py-20 pb-32 bg-white">
+    <!-- Header Section -->
+    <div class="mb-12">
+      <!-- Titre et description -->
+      <div class="mb-8">
+        <h1 class="font-title text-5xl font-normal tracking-tight text-[#2A2017] mb-4">
+          Ma Galerie
+        </h1>
+        <p class="font-subtitle text-xs leading-relaxed text-[#2A2017] uppercase tracking-widest">
+          Retrouvez toutes vos créations de lunettes personnalisées. Modifiez, visualisez<br>
+          ou commandez vos modèles préférés.
+        </p>
+      </div>
+      
+      <!-- Actions: Compteur + Search + Delete -->
+      <div class="flex gap-4 items-center flex-wrap">
+        <!-- Counter Badge -->
+        <div class="flex items-center gap-2 bg-[#2A2017] text-white px-4 py-2.5 rounded">
+          <span class="font-body text-xl font-bold">{lunettes.length}</span>
+          <span class="font-body text-sm">Paires créées</span>
+        </div>
+
+        <!-- Search Box -->
+        <div class="flex items-center gap-3 flex-1 min-w-[300px] bg-white border border-[#2A2017] rounded px-4 py-2.5 transition-all duration-200 focus-within:border-[#2A2017]">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="flex-shrink-0 text-[#2A2017]">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.35-4.35"></path>
+          </svg>
+          <input 
+            type="text" 
+            id="searchInput" 
+            placeholder="Filtrer mes modèles..." 
+            class="border-none outline-none w-full font-body text-sm text-[#2A2017] placeholder:text-gray-600"
+          />
+        </div>
+        
+        <!-- Delete Button -->
+        <button 
+          id="deleteAllBtn"
+          class="inline-flex items-center gap-2 bg-[#2A2017] text-white px-5 py-2.5 rounded font-btn text-sm font-medium transition-all duration-200 hover:bg-[#3d2f20] whitespace-nowrap"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+          Tout supprimer
+        </button>
+      </div>
+    </div>
+
+    <!-- Error Message -->
+    {error && (
+      <div class="flex items-center gap-4 p-5 px-6 bg-red-50 border border-red-200 rounded-lg text-red-600 mb-8">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="flex-shrink-0">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <p class="m-0 font-body text-base">Erreur lors du chargement des lunettes : {error}</p>
+      </div>
+    )}
+
+    <!-- Empty State -->
+    {!error && lunettes.length === 0 && (
+      <div class="flex flex-col items-center justify-center py-20 px-10 text-center">
+        <svg viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg" class="w-[200px] h-auto text-gray-300 mb-8">
+          <g stroke="currentColor" stroke-width="2" fill="none">
+            <circle cx="50" cy="40" r="25" />
+            <circle cx="150" cy="40" r="25" />
+            <line x1="75" y1="40" x2="125" y2="40" />
+            <line x1="25" y1="40" x2="10" y2="35" />
+            <line x1="175" y1="40" x2="190" y2="35" />
+          </g>
+        </svg>
+        <h2 class="font-title text-3xl font-bold text-[#2A2017] m-0 mb-3">
+          Aucune lunette dans votre galerie
+        </h2>
+        <p class="font-body text-lg text-gray-600 m-0 mb-8">
+          Commencez par créer votre première paire de lunettes personnalisée
+        </p>
+        <a 
+          href="/configurateur" 
+          class="bg-[#2A2017] text-white px-8 py-3 rounded font-btn text-base font-medium no-underline transition-all duration-200 hover:bg-[#3d2f20]"
+        >
+          Créer mes lunettes
+        </a>
+      </div>
+    )}
+
+    <!-- Lunettes Grid -->
+    {!error && lunettes.length > 0 && (
+      <div class="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-8" id="lunettesGrid">
+        {lunettes.map((lunette) => (
+          <LunetteCard
+            id={lunette.id}
+            nom_modele={lunette.nom_modele || 'Modèle sans nom'}
+            nom_personnalisation={lunette.nom_personnalisation}
+            taille={lunette.taille}
+            prix={lunette.prix}
+            image={lunette.image ? pb.files.getUrl(lunette, lunette.image) : undefined}
+            verres={lunette.verres}
+            cercles={lunette.cercles}
+            branche={lunette.branche}
+          />
+        ))}
+      </div>
+    )}
+  </main>
+</Layout>
+
+<style>
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    main {
+      padding: 2.5rem 1.25rem 5rem;
+    }
+
+    h1 {
+      font-size: 2rem;
+    }
+
+    p {
+      font-size: 1rem;
+    }
+
+    .grid {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    h1 {
+      font-size: 1.75rem;
+    }
+  }
+</style>
+
+<script>
+  // Fonction de recherche/filtrage
+  const searchInput = document.getElementById('searchInput') as HTMLInputElement;
+  const lunettesGrid = document.getElementById('lunettesGrid');
+
+  if (searchInput && lunettesGrid) {
+    searchInput.addEventListener('input', (e) => {
+      const searchTerm = (e.target as HTMLInputElement).value.toLowerCase();
+      const cards = lunettesGrid.querySelectorAll('.lunette-card');
+
+      cards.forEach((card) => {
+        const title = card.querySelector('.card-title')?.textContent?.toLowerCase() || '';
+        const subtitle = card.querySelector('.card-subtitle')?.textContent?.toLowerCase() || '';
+        
+        if (title.includes(searchTerm) || subtitle.includes(searchTerm)) {
+          (card as HTMLElement).style.display = 'block';
+        } else {
+          (card as HTMLElement).style.display = 'none';
+        }
+      });
+    });
+  }
+
+  // Gestion du bouton "Tout supprimer"
+  const deleteAllBtn = document.getElementById('deleteAllBtn');
+  if (deleteAllBtn) {
+    deleteAllBtn.addEventListener('click', () => {
+      if (confirm('Êtes-vous sûr de vouloir supprimer toutes vos lunettes ? Cette action est irréversible.')) {
+        // Logique de suppression à implémenter avec PocketBase
+        console.log('Suppression de toutes les lunettes');
+        // Après suppression, recharger la page
+        // window.location.reload();
+      }
+    });
+  }
+</script>
