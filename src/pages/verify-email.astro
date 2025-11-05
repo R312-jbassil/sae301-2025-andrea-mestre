@@ -1,0 +1,89 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+---
+
+<Layout title="Vérification Email - TAVUE">
+  <Header />
+  
+  <main class="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4">
+    <div class="max-w-md w-full">
+      <div class="bg-white rounded-2xl shadow-xl p-10 text-center">
+        <div id="loading" class="space-y-4">
+          <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-[#9B8B7E] mx-auto"></div>
+          <p class="text-gray-600">Vérification de votre email en cours...</p>
+        </div>
+        
+        <div id="success" class="hidden space-y-4">
+          <svg class="w-16 h-16 text-green-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <h2 class="text-2xl font-bold text-gray-900">Email vérifié !</h2>
+          <p class="text-gray-600">Votre adresse email a été vérifiée avec succès.</p>
+          <p class="text-sm text-gray-500">Redirection en cours...</p>
+        </div>
+        
+        <div id="error" class="hidden space-y-4">
+          <svg class="w-16 h-16 text-red-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <h2 class="text-2xl font-bold text-gray-900">Erreur de vérification</h2>
+          <p id="error-message" class="text-gray-600"></p>
+          <a href="/connexion" class="inline-block mt-4 px-6 py-3 bg-[#9B8B7E] text-white rounded-lg hover:bg-[#8A7A6D] transition-colors">
+            Retour à la connexion
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+</Layout>
+
+<script>
+  import pb from '../utils/pb';
+
+  async function verifyEmail() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+    
+    const loadingDiv = document.getElementById('loading');
+    const successDiv = document.getElementById('success');
+    const errorDiv = document.getElementById('error');
+    const errorMessage = document.getElementById('error-message');
+    
+    if (!token) {
+      if (loadingDiv) loadingDiv.classList.add('hidden');
+      if (errorDiv) errorDiv.classList.remove('hidden');
+      if (errorMessage) errorMessage.textContent = 'Token de vérification manquant.';
+      return;
+    }
+    
+    try {
+      await pb.collection('users').confirmVerification(token);
+      
+      if (loadingDiv) loadingDiv.classList.add('hidden');
+      if (successDiv) successDiv.classList.remove('hidden');
+      
+      setTimeout(() => {
+        window.location.href = '/connexion';
+      }, 2000);
+      
+    } catch (error: any) {
+      console.error('Erreur de vérification:', error);
+      
+      if (loadingDiv) loadingDiv.classList.add('hidden');
+      if (errorDiv) errorDiv.classList.remove('hidden');
+      
+      let errorText = 'Une erreur est survenue lors de la vérification.';
+      
+      if (error.status === 404) {
+        errorText = 'Le lien de vérification est invalide ou a expiré.';
+      } else if (error.response?.message) {
+        errorText = error.response.message;
+      }
+      
+      if (errorMessage) errorMessage.textContent = errorText;
+    }
+  }
+  
+  verifyEmail();
+</script>

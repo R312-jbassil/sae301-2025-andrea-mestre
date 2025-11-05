@@ -201,16 +201,19 @@ import googleIcon from '../assets/images/google.webp';
         emailVisibility: true
       });
       
+      // Envoyer l'email de vérification
+      const redirectUrl = `${window.location.origin}/verify-email`;
+      await pb.collection('users').requestVerification(email);
+      
       if (successMessage) {
-        successMessage.textContent = 'Inscription réussie ! Connexion en cours...';
+        successMessage.textContent = 'Inscription réussie ! Veuillez vérifier votre email pour activer votre compte.';
         successMessage.classList.remove('hidden');
       }
       
-      const authData = await pb.collection('users').authWithPassword(email, password);
-      
+      // Ne pas se connecter automatiquement, attendre la vérification
       setTimeout(() => {
-        window.location.href = '/';
-      }, 1000);
+        window.location.href = '/connexion';
+      }, 3000);
       
     } catch (error: any) {
       console.error('Erreur d\'inscription:', error);
