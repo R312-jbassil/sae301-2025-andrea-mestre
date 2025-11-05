@@ -162,6 +162,8 @@ try {
 </style>
 
 <script>
+  import { deleteAllLunettes } from '../utils/pb';
+
   // Fonction de recherche/filtrage
   const searchInput = document.getElementById('searchInput') as HTMLInputElement;
   const lunettesGrid = document.getElementById('lunettesGrid');
@@ -185,14 +187,45 @@ try {
   }
 
   // Gestion du bouton "Tout supprimer"
-  const deleteAllBtn = document.getElementById('deleteAllBtn');
+  const deleteAllBtn = document.getElementById('deleteAllBtn') as HTMLButtonElement;
   if (deleteAllBtn) {
-    deleteAllBtn.addEventListener('click', () => {
+    deleteAllBtn.addEventListener('click', async () => {
       if (confirm('Êtes-vous sûr de vouloir supprimer toutes vos lunettes ? Cette action est irréversible.')) {
-        // Logique de suppression à implémenter avec PocketBase
-        console.log('Suppression de toutes les lunettes');
-        // Après suppression, recharger la page
-        // window.location.reload();
+        try {
+          // Désactiver le bouton pendant la suppression
+          deleteAllBtn.disabled = true;
+          deleteAllBtn.textContent = 'Suppression en cours...';
+
+          // Appeler la fonction de suppression
+          const result = await deleteAllLunettes();
+          
+          if (result.success) {
+            alert(`${result.count} lunette(s) supprimée(s) avec succès !`);
+            // Recharger la page pour voir les changements
+            window.location.reload();
+          } else {
+            alert(`Erreur lors de la suppression : ${result.error}`);
+            deleteAllBtn.disabled = false;
+            deleteAllBtn.innerHTML = `
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
+              Tout supprimer
+            `;
+          }
+        } catch (error) {
+          console.error('Erreur lors de la suppression:', error);
+          alert('Une erreur est survenue lors de la suppression.');
+          deleteAllBtn.disabled = false;
+          deleteAllBtn.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+            Tout supprimer
+          `;
+        }
       }
     });
   }
