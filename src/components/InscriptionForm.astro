@@ -1,9 +1,19 @@
 ---
 import googleIcon from '../assets/images/google.webp';
+import memberIcon from '../assets/member.svg';
 ---
 
 <div class="w-full max-w-lg mx-auto">
   <div class="bg-white rounded-2xl shadow-xl p-10 min-h-[650px]">
+    <!-- Nudge de membres satisfaits -->
+    <div class="flex items-center gap-3 bg-[#68503B]/10 rounded-xl p-4 border border-[#68503B]/20 mb-6">
+      <img src={memberIcon.src} alt="Membres satisfaits" class="w-10 h-10 flex-shrink-0" />
+      <div class="text-sm text-gray-700">
+        <span class="font-semibold">+10 000 membres satisfaits</span>
+        <p class="text-gray-600">Rejoignez notre communauté</p>
+      </div>
+    </div>
+
     <div class="relative bg-gray-200 rounded-full p-1 mb-8">
       <div 
         id="slider-inscription"
