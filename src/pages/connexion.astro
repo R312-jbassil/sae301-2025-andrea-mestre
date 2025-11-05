@@ -12,14 +12,12 @@ import InscriptionForm from '../components/InscriptionForm.astro';
 		class="min-h-screen bg-cover bg-center bg-no-repeat flex items-center justify-center py-12 px-4"
 		style="background-image: url('/background_connexion.webp');"
 	>
-		<!-- Conteneur pour les formulaires -->
+	
 		<div class="relative w-full max-w-lg">
-			<!-- Formulaire de connexion -->
 			<div id="connexion-view" class="transition-opacity duration-300">
 				<ConnexionForm />
 			</div>
 			
-			<!-- Formulaire d'inscription (caché par défaut) -->
 			<div id="inscription-view" class="hidden transition-opacity duration-300">
 				<InscriptionForm />
 			</div>
@@ -28,18 +26,15 @@ import InscriptionForm from '../components/InscriptionForm.astro';
 </Layout>
 
 <script>
-	// Gestion du changement de vue entre connexion et inscription
 	window.addEventListener('changeAuthView', ((e: CustomEvent) => {
 		const view = e.detail;
 		const connexionView = document.getElementById('connexion-view');
 		const inscriptionView = document.getElementById('inscription-view');
 		
 		if (view === 'connexion') {
-			// Afficher connexion, cacher inscription
 			connexionView?.classList.remove('hidden');
 			inscriptionView?.classList.add('hidden');
 		} else if (view === 'inscription') {
-			// Afficher inscription, cacher connexion
 			connexionView?.classList.add('hidden');
 			inscriptionView?.classList.remove('hidden');
 		}
