@@ -1,1 +1,105 @@
 @import "tailwindcss";
+
+/* ===== IMPORT DES POLICES ===== */
+/* Inter - Police principale */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+/* Courier Prime - Police monospace pour les titres/sous-titres */
+@import url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap');
+
+/* ===== VARIABLES PERSONNALISÉES ===== */
+@theme {
+  /* Couleurs principales */
+  --color-primary: #2563eb; /* Bleu principal */
+  --color-primary-dark: #1e40af;
+  --color-primary-light: #60a5fa;
+  
+  --color-secondary: #7c3aed; /* Violet secondaire */
+  --color-secondary-dark: #5b21b6;
+  --color-secondary-light: #a78bfa;
+  
+  --color-accent: #f59e0b; /* Orange accent */
+  --color-accent-dark: #d97706;
+  --color-accent-light: #fbbf24;
+  
+  /* Couleurs de matériaux pour lunettes */
+  --color-frame-black: #1f2937;
+  --color-frame-tortoise: #92400e;
+  --color-frame-blue: #1e40af;
+  --color-frame-red: #dc2626;
+  --color-frame-gold: #ca8a04;
+  --color-frame-silver: #71717a;
+  --color-frame-transparent: #f3f4f6;
+  
+  /* Couleurs verres */
+  --color-lens-clear: rgba(255, 255, 255, 0.1);
+  --color-lens-sunglasses: rgba(0, 0, 0, 0.6);
+  --color-lens-blue-light: rgba(255, 200, 87, 0.15);
+  --color-lens-transition: rgba(128, 128, 128, 0.3);
+  
+  /* ===== TYPOGRAPHIE ===== */
+  /* Polices de caractères */
+  --font-title: 'Courier Prime', monospace; /* Pour title_1 */
+  --font-subtitle: 'Courier Prime', monospace; /* Pour subtitle */
+  --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif; /* Pour le texte général */
+  --font-btn: 'Inter', ui-sans-serif, system-ui, sans-serif; /* Pour les boutons */
+  
+  /* Tailles de police - basées sur votre Figma */
+  /* title_1 : Inter Regular 48 / -5% */
+  --font-size-title-1: 3rem; /* 48px */
+  --font-weight-title-1: 400;
+  --letter-spacing-title-1: -0.05em; /* -5% */
+  --line-height-title-1: 1.2; /* 36px = 75% de 48px */
+  
+  /* subtitle : Courier Prime Regular 17 / 15% */
+  --font-size-subtitle: 1.0625rem; /* 17px */
+  --font-weight-subtitle: 400;
+  --letter-spacing-subtitle: 0.15em; /* 15% */
+  --line-height-subtitle: 1.41; /* 24px = 141% de 17px */
+  
+  /* btn : Inter Regular 13 / -0.5px */
+  --font-size-btn: 0.8125rem; /* 13px */
+  --font-weight-btn: 400;
+  --letter-spacing-btn: -0.5px; /* -0.5px */
+  --line-height-btn: 1.85; /* 24px = 185% de 13px */
+  
+  /* Espacements personnalisés */
+  --spacing-header: 4rem;
+  --spacing-section: 6rem;
+  --spacing-card: 1.5rem;
+  
+  /* Rayons de bordure */
+  --radius-small: 0.375rem;
+  --radius-medium: 0.5rem;
+  --radius-large: 0.75rem;
+  --radius-xl: 1rem;
+  
+  /* Ombres */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+  
+  /* Transitions */
+  --transition-fast: 150ms;
+  --transition-normal: 200ms;
+  --transition-slow: 300ms;
+  
+  /* Breakpoints (pour référence) */
+  --screen-sm: 640px;
+  --screen-md: 768px;
+  --screen-lg: 1024px;
+  --screen-xl: 1280px;
+  --screen-2xl: 1536px;
+}
+
+/* ===== STYLES GLOBAUX ===== */
+
+
+html {
+  scroll-behavior: smooth;
+}
+
+
+
+/
