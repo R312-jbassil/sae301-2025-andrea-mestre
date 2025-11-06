@@ -322,7 +322,7 @@ import ChevronSvg from '../assets/chevron.svg?raw';
 		size: 'S',
 		sizeIndex: 0,
 		sizeValue: '60-18',
-		lenses: 'clear',
+		lenses: 'Verres anti-lumière bleue', // Libellé par défaut
 		frameColor: '#1D1D1B',
 		templeColor: '#1D1D1B',
 		case: 'soft',
@@ -351,7 +351,7 @@ import ChevronSvg from '../assets/chevron.svg?raw';
 					config.nom_modele = lunette.nom_modele || 'WAYFARER';
 					config.nom_personnalisation = lunette.nom_personnalisation || '';
 					config.price = lunette.prix || 146;
-					config.lenses = lunette.verres || 'clear';
+					config.lenses = lunette.verres || 'Verres anti-lumière bleue';
 					config.frameColor = lunette.cercles || '#1D1D1B';
 					config.templeColor = lunette.branches || '#1D1D1B';
 					config.case = lunette.etui || 'soft';
@@ -486,7 +486,9 @@ import ChevronSvg from '../assets/chevron.svg?raw';
 		document.querySelectorAll('input[name="lenses"]').forEach(radio => {
 			radio.addEventListener('change', (e) => {
 				const target = e.target as HTMLInputElement;
+				const label = target.closest('label')?.querySelector('span')?.textContent || target.value;
 				updateLensType(target.value);
+				config.lenses = label.trim(); // Sauvegarder le libellé exact au lieu de la valeur
 			});
 		});
 
@@ -582,7 +584,7 @@ import ChevronSvg from '../assets/chevron.svg?raw';
 			size: 'S',
 			sizeIndex: 0,
 			sizeValue: '60-18',
-			lenses: 'clear',
+			lenses: 'Verres anti-lumière bleue',
 			frameColor: '#1D1D1B',
 			templeColor: '#1D1D1B',
 			case: 'soft',
@@ -873,6 +875,14 @@ import ChevronSvg from '../assets/chevron.svg?raw';
 			updateFrameColor(config.frameColor);
 			updateTempleColor(config.templeColor);
 			
+			// Sélectionner le bon radio button pour les verres
+			document.querySelectorAll('input[name="lenses"]').forEach(radio => {
+				const label = radio.closest('label')?.querySelector('span')?.textContent?.trim();
+				if (label === config.lenses) {
+					(radio as HTMLInputElement).checked = true;
+				}
+			});
+			
 			// Mettre à jour l'étui sélectionné
 			document.querySelectorAll('[data-case]').forEach(btn => {
 				const caseType = btn.getAttribute('data-case');
@@ -927,6 +937,13 @@ import ChevronSvg from '../assets/chevron.svg?raw';
 		updateFrameColor('#1D1D1B');
 		updateTempleColor('#1D1D1B');
 		updateGlassesSize(0);
+		
+		// Initialiser le libellé des verres par défaut
+		const defaultLensRadio = document.querySelector('input[name="lenses"][value="clear"]') as HTMLInputElement;
+		if (defaultLensRadio) {
+			const defaultLabel = defaultLensRadio.closest('label')?.querySelector('span')?.textContent || 'Verres anti-lumière bleue';
+			config.lenses = defaultLabel.trim();
+		}
 
 		// ===== CHARGER UNE LUNETTE EN MODE ÉDITION =====
 		loadLunetteForEdit();
