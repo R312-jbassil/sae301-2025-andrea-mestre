@@ -11,6 +11,7 @@ interface Props {
   verres?: string;
   cercles?: string;
   branche?: string;
+  created?: string;
 }
 
 const { 
@@ -24,31 +25,38 @@ const {
   svgCode,
   verres,
   cercles,
-  branche
+  branche,
+  created
 } = Astro.props;
 
 // Badge de personnalisation
 const isIA = type === 'ia';
 const hasCustomization = nom_personnalisation && nom_personnalisation.trim() !== '';
+
+// Formater la date
+const formatDate = (dateString?: string) => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
+};
 ---
 
-<a 
-  href={`/lunette/${id}`} 
-  class="block relative bg-gray-100 rounded-lg overflow-hidden border border-gray-200 transition-all duration-200 no-underline text-inherit h-full hover:shadow-md lunette-card"
->
-  <!-- Badge -->
-  <div class="absolute top-3 left-3 bg-brand-brown text-white px-3 py-1.5 rounded text-[0.625rem] font-bold tracking-wide uppercase z-10">
-    {isIA ? '✨ IA' : (hasCustomization ? 'MODIFIÉ' : 'STANDARD')}
-  </div>
+<div class="block relative bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-200 transition-all duration-300 no-underline text-inherit h-full hover:shadow-xl lunette-card">
+  <!-- Date badge en haut à droite -->
+  {created && (
+    <div class="absolute top-4 right-4 bg-gray-800 text-white px-3 py-1 rounded-full text-[0.65rem] font-medium z-10">
+      {formatDate(created)}
+    </div>
+  )}
   
-  <!-- Image Section -->
-  <div class="w-full h-[200px] bg-white flex items-center justify-center overflow-hidden p-4">
+  <!-- Image Section avec fond gris clair -->
+  <div class="w-full h-[280px] bg-gray-50 flex items-center justify-center overflow-hidden p-8">
     {isIA && svgCode ? (
       <div class="w-full h-full flex items-center justify-center" set:html={svgCode} />
     ) : image ? (
       <img src={image} alt={nom_personnalisation || nom_modele} class="w-full h-full object-contain" />
     ) : (
-      <svg viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg" class="w-3/5 h-auto text-gray-300">
+      <svg viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg" class="w-4/5 h-auto text-gray-300">
         <g stroke="currentColor" stroke-width="2" fill="none">
           <circle cx="50" cy="40" r="25" />
           <circle cx="150" cy="40" r="25" />
@@ -61,52 +69,69 @@ const hasCustomization = nom_personnalisation && nom_personnalisation.trim() !==
   </div>
   
   <!-- Content Section -->
-  <div class="p-4">
-    <h3 class="font-body text-lg font-semibold text-brand-brown m-0 mb-1 overflow-hidden text-ellipsis whitespace-nowrap card-title">
+  <div class="p-6">
+    <h3 class="font-body text-xl font-bold text-gray-900 m-0 mb-2 overflow-hidden text-ellipsis whitespace-nowrap card-title">
       {nom_personnalisation || nom_modele}
     </h3>
-    <p class="font-subtitle text-xs text-gray-600 m-0 mb-3 uppercase tracking-wider card-subtitle">
+    <p class="font-subtitle text-sm text-gray-500 m-0 mb-4 card-subtitle">
       {isIA ? 'Généré par IA' : `Modèle ${nom_modele}`}
     </p>
     
     <!-- Details -->
     {!isIA && (
-      <div class="flex flex-col gap-0.5 mb-4 text-xs text-gray-700">
-        {taille && <span class="font-body leading-relaxed">• Taille {taille}</span>}
-        {verres && <span class="font-body leading-relaxed">• Verres de {verres}</span>}
-        {cercles && <span class="font-body leading-relaxed">• {cercles}</span>}
-      </div>
+      <ul class="list-none p-0 m-0 mb-6 space-y-2">
+        {taille && (
+          <li class="font-body text-sm text-gray-700 flex items-center">
+            <span class="w-1.5 h-1.5 rounded-full bg-gray-900 mr-2"></span>
+            Taille: {taille}-18
+          </li>
+        )}
+        {verres && (
+          <li class="font-body text-sm text-gray-700 flex items-center">
+            <span class="w-1.5 h-1.5 rounded-full bg-gray-900 mr-2"></span>
+            {verres}
+          </li>
+        )}
+        {cercles && (
+          <li class="font-body text-sm text-gray-700 flex items-center">
+            <span class="w-1.5 h-1.5 rounded-full bg-gray-900 mr-2"></span>
+            Monture: {cercles}
+          </li>
+        )}
+      </ul>
     )}
     
     <!-- Footer: Price + Actions -->
-    <div class="flex justify-between items-center pt-3 border-t border-gray-200">
+    <div class="flex justify-between items-center">
       {prix ? (
-        <span class="font-body text-xl font-bold text-brand-brown">{prix} €</span>
+        <span class="font-body text-2xl font-bold text-gray-900">{prix} €</span>
       ) : (
         <span class="font-body text-sm text-gray-500 italic">Prix non défini</span>
       )}
       
-      <div class="flex gap-1.5">
-        <button 
-          class="action-btn bg-transparent border border-gray-300 rounded p-1.5 cursor-pointer transition-all duration-200 text-gray-600 flex items-center justify-center hover:bg-gray-200 hover:border-gray-400 hover:text-black" 
+      <div class="flex gap-2">
+        <a
+          href={`/lunette/${id}`}
+          class="action-btn bg-white border border-gray-300 rounded-lg p-2 cursor-pointer transition-all duration-200 text-gray-700 flex items-center justify-center hover:bg-gray-50 hover:border-gray-400" 
           aria-label="Voir les détails"
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
             <circle cx="12" cy="12" r="3"></circle>
           </svg>
-        </button>
-        <button 
-          class="action-btn copy-btn bg-transparent border border-gray-300 rounded p-1.5 cursor-pointer transition-all duration-200 text-gray-600 flex items-center justify-center hover:bg-gray-200 hover:border-gray-400 hover:text-black" 
-          aria-label="Copier"
+        </a>
+        <a
+          href={`/configurateur?edit=${id}`}
+          class="action-btn copy-btn bg-white border border-gray-300 rounded-lg p-2 cursor-pointer transition-all duration-200 text-gray-700 flex items-center justify-center hover:bg-gray-50 hover:border-gray-400" 
+          aria-label="Modifier"
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
           </svg>
-        </button>
+        </a>
         <button 
-          class="action-btn delete-btn bg-transparent border border-gray-300 rounded p-1.5 cursor-pointer transition-all duration-200 text-gray-600 flex items-center justify-center hover:bg-brand-brown hover:border-brand-brown hover:text-white" 
+          class="action-btn delete-btn bg-white border border-gray-300 rounded-lg p-2 cursor-pointer transition-all duration-200 text-red-600 flex items-center justify-center hover:bg-red-50 hover:border-red-400" 
           aria-label="Supprimer"
           data-id={id}
           data-type={type}
@@ -119,26 +144,64 @@ const hasCustomization = nom_personnalisation && nom_personnalisation.trim() !==
       </div>
     </div>
   </div>
-</a>
+</div>
 
 <style>
-  /* Prevent hover effects on card when clicking buttons */
   .action-btn {
     position: relative;
     z-index: 20;
   }
+  
+  .lunette-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .lunette-card:hover {
+    transform: translateY(-4px);
+  }
 </style>
 
 <script>
-  // Empêcher la navigation quand on clique sur les boutons d'action
-  document.querySelectorAll('.action-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
+  import { deleteLunette } from '../utils/pb';
+
+  // Gestion du bouton supprimer
+  document.querySelectorAll('.delete-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
       e.preventDefault();
       e.stopPropagation();
       
-      // Ici vous pouvez ajouter la logique pour chaque bouton
-      const action = btn.getAttribute('aria-label');
-      console.log('Action:', action);
+      const button = e.currentTarget as HTMLElement;
+      const id = button.getAttribute('data-id');
+      const type = button.getAttribute('data-type') as 'manuel' | 'ia';
+      
+      if (!id) return;
+      
+      if (confirm('⚠️ Êtes-vous sûr de vouloir supprimer cette lunette ?')) {
+        try {
+          const result = await deleteLunette(id, type);
+          
+          if (result.success) {
+            // Supprimer la carte du DOM avec animation
+            const card = button.closest('.lunette-card') as HTMLElement;
+            if (card) {
+              card.style.transition = 'all 0.3s ease';
+              card.style.opacity = '0';
+              card.style.transform = 'scale(0.8)';
+              
+              setTimeout(() => {
+                card.remove();
+                // Recharger la page pour mettre à jour le compteur
+                window.location.reload();
+              }, 300);
+            }
+          } else {
+            alert('❌ Erreur lors de la suppression: ' + result.error);
+          }
+        } catch (error) {
+          console.error('Erreur:', error);
+          alert('❌ Erreur lors de la suppression');
+        }
+      }
     });
   });
 </script>
