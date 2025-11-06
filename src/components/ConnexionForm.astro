@@ -148,7 +148,16 @@ import securiteIcon from '../assets/securite.svg';
     try {
       const authData = await pb.collection('users').authWithOAuth2({ provider: 'google' });
       
-      if (authData) {
+      if (authData && pb.authStore.isValid) {
+        // Sauvegarder le cookie d'authentification
+        const expires = new Date();
+        expires.setDate(expires.getDate() + 7);
+        const cookieValue = JSON.stringify({
+          token: pb.authStore.token,
+          model: pb.authStore.model
+        });
+        document.cookie = `pb_auth=${encodeURIComponent(cookieValue)}; path=/; expires=${expires.toUTCString()}; SameSite=Lax`;
+        
         if (successMessage) {
           successMessage.textContent = 'Connexion avec Google réussie !';
           successMessage.classList.remove('hidden');
@@ -182,6 +191,18 @@ import securiteIcon from '../assets/securite.svg';
     
     try {
       const authData = await pb.collection('users').authWithPassword(email, password);
+      
+      // Sauvegarder le cookie d'authentification pour les requêtes SSR
+      if (authData && pb.authStore.isValid) {
+        // Créer un cookie avec les données d'authentification (expire dans 7 jours)
+        const expires = new Date();
+        expires.setDate(expires.getDate() + 7);
+        const cookieValue = JSON.stringify({
+          token: pb.authStore.token,
+          model: pb.authStore.model
+        });
+        document.cookie = `pb_auth=${encodeURIComponent(cookieValue)}; path=/; expires=${expires.toUTCString()}; SameSite=Lax`;
+      }
       
       if (successMessage) {
         successMessage.textContent = 'Connexion réussie ! Redirection...';

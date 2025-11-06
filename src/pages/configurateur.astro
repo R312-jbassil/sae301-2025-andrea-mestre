@@ -934,9 +934,10 @@ import ChevronSvg from '../assets/chevron.svg?raw';
 		try {
 			// Vérifier si l'utilisateur est connecté
 			if (!isUserAuthenticated()) {
-				alert('❌ Vous devez être connecté pour sauvegarder une lunette.\n\nVeuillez vous connecter d\'abord.');
-				// Rediriger vers la page de connexion
-				window.location.href = '/connexion';
+				if (confirm('Vous devez être connecté pour sauvegarder vos créations. Voulez-vous vous connecter maintenant ?')) {
+					// Rediriger vers la page de connexion avec redirect
+					window.location.href = '/connexion?redirect=/configurateur';
+				}
 				return;
 			}
 

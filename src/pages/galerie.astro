@@ -4,14 +4,33 @@ import Header from '../components/Header.astro';
 import LunetteCard from '../components/LunetteCard.astro';
 import pb from '../utils/pb';
 
-// Récupération de toutes les lunettes depuis PocketBase
+const authCookie = Astro.cookies.get('pb_auth');
+if (authCookie?.value) {
+  try {
+    const authData = JSON.parse(decodeURIComponent(authCookie.value));
+    if (authData.token && authData.model) {
+      pb.authStore.save(authData.token, authData.model);
+    }
+  } catch (e) {
+    console.error('Erreur lors du chargement de l\'authentification:', e);
+  }
+}
+
+const isAuthenticated = pb.authStore.isValid;
+const user = pb.authStore.model;
+
+if (!isAuthenticated || !user) {
+  return Astro.redirect('/connexion?redirect=/galerie');
+}
+
 let lunettes: any[] = [];
 let error = '';
 
 try {
-  // Récupérer toutes les lunettes de la collection
   const resultList = await pb.collection('lunette').getList(1, 50, {
-    sort: '-created', // Trier par date de création (plus récent en premier)
+    filter: `user = "${user.id}"`,
+    sort: '-created',
+    expand: 'materiau',
   });
   lunettes = resultList.items;
 } catch (e: any) {
@@ -24,9 +43,7 @@ try {
   <Header />
   
   <main class="max-w-[1400px] mx-auto px-10 py-20 pb-32 bg-white">
-    <!-- Header Section -->
     <div class="mb-12">
-      <!-- Titre et description -->
       <div class="mb-8">
         <h1 class="font-title text-5xl font-normal tracking-tight text-brand-brown mb-4">
           Ma Galerie
@@ -37,15 +54,12 @@ try {
         </p>
       </div>
       
-      <!-- Actions: Compteur + Search + Delete -->
       <div class="flex gap-4 items-center flex-wrap">
-        <!-- Counter Badge -->
         <div class="flex items-center gap-2 bg-brand-brown text-white px-4 py-2.5 rounded">
           <span class="font-body text-xl font-bold">{lunettes.length}</span>
           <span class="font-body text-sm">Paires créées</span>
         </div>
 
-        <!-- Search Box -->
         <div class="flex items-center gap-3 flex-1 min-w-[300px] bg-white border border-brand-brown rounded px-4 py-2.5 transition-all duration-200 focus-within:border-brand-brown">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="shrink-0 text-brand-brown">
             <circle cx="11" cy="11" r="8"></circle>
@@ -59,7 +73,6 @@ try {
           />
         </div>
         
-        <!-- Delete Button -->
         <button 
           id="deleteAllBtn"
           class="inline-flex items-center gap-2 bg-brand-brown text-white px-5 py-2.5 rounded font-btn text-sm font-medium transition-all duration-200 hover:bg-[#3d2f20] whitespace-nowrap"
@@ -73,7 +86,6 @@ try {
       </div>
     </div>
 
-    <!-- Error Message -->
     {error && (
       <div class="flex items-center gap-4 p-5 px-6 bg-red-50 border border-red-200 rounded-lg text-red-600 mb-8">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="flex-shrink-0">
@@ -85,7 +97,6 @@ try {
       </div>
     )}
 
-    <!-- Empty State -->
     {!error && lunettes.length === 0 && (
       <div class="flex flex-col items-center justify-center py-20 px-10 text-center">
         <svg viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg" class="w-[200px] h-auto text-gray-300 mb-8">
@@ -112,7 +123,6 @@ try {
       </div>
     )}
 
-    <!-- Lunettes Grid -->
     {!error && lunettes.length > 0 && (
       <div class="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-8" id="lunettesGrid">
         {lunettes.map((lunette) => (
@@ -134,7 +144,6 @@ try {
 </Layout>
 
 <style>
-  /* Responsive adjustments */
   @media (max-width: 768px) {
     main {
       padding: 2.5rem 1.25rem 5rem;
@@ -164,7 +173,6 @@ try {
 <script>
   import { deleteAllLunettes } from '../utils/pb';
 
-  // Fonction de recherche/filtrage
   const searchInput = document.getElementById('searchInput') as HTMLInputElement;
   const lunettesGrid = document.getElementById('lunettesGrid');
 
@@ -186,22 +194,18 @@ try {
     });
   }
 
-  // Gestion du bouton "Tout supprimer"
   const deleteAllBtn = document.getElementById('deleteAllBtn') as HTMLButtonElement;
   if (deleteAllBtn) {
     deleteAllBtn.addEventListener('click', async () => {
       if (confirm('Êtes-vous sûr de vouloir supprimer toutes vos lunettes ? Cette action est irréversible.')) {
         try {
-          // Désactiver le bouton pendant la suppression
           deleteAllBtn.disabled = true;
           deleteAllBtn.textContent = 'Suppression en cours...';
 
-          // Appeler la fonction de suppression
           const result = await deleteAllLunettes();
           
           if (result.success) {
             alert(`${result.count} lunette(s) supprimée(s) avec succès !`);
-            // Recharger la page pour voir les changements
             window.location.reload();
           } else {
             alert(`Erreur lors de la suppression : ${result.error}`);

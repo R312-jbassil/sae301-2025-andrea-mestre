@@ -7,7 +7,7 @@ import memberIcon from '../assets/member.svg';
   <div class="bg-white rounded-2xl shadow-xl p-10 min-h-[650px]">
     <!-- Nudge de membres satisfaits -->
     <div class="flex items-center gap-3 bg-[#68503B]/10 rounded-xl p-4 border border-[#68503B]/20 mb-6">
-      <img src={memberIcon.src} alt="Membres satisfaits" class="w-10 h-10 flex-shrink-0" />
+      <img src={memberIcon.src} alt="Membres satisfaits" class="w-10 h-10" />
       <div class="text-sm text-gray-700">
         <span class="font-semibold">+10 000 membres satisfaits</span>
         <p class="text-gray-600">Rejoignez notre communauté</p>
@@ -188,7 +188,16 @@ import memberIcon from '../assets/member.svg';
     try {
       const authData = await pb.collection('users').authWithOAuth2({ provider: 'google' });
       
-      if (authData) {
+      if (authData && pb.authStore.isValid) {
+        // Sauvegarder le cookie d'authentification
+        const expires = new Date();
+        expires.setDate(expires.getDate() + 7);
+        const cookieValue = JSON.stringify({
+          token: pb.authStore.token,
+          model: pb.authStore.model
+        });
+        document.cookie = `pb_auth=${encodeURIComponent(cookieValue)}; path=/; expires=${expires.toUTCString()}; SameSite=Lax`;
+        
         if (successMessage) {
           successMessage.textContent = 'Inscription avec Google réussie !';
           successMessage.classList.remove('hidden');

@@ -5,11 +5,22 @@ import pb from '../../utils/pb';
 
 export const POST: APIRoute = async ({ request, cookies }) => {
   try {
-    // Vérifier l'authentification (optionnel)
+    // Vérifier l'authentification (OBLIGATOIRE pour sauvegarder)
     const authCookie = cookies.get('pb_auth');
     
     if (authCookie) {
       pb.authStore.loadFromCookie(authCookie.value || '');
+    }
+
+    // Vérifier que l'utilisateur est connecté
+    if (!pb.authStore.isValid || !pb.authStore.model) {
+      return new Response(
+        JSON.stringify({ 
+          error: 'Vous devez être connecté pour sauvegarder vos créations.',
+          requireAuth: true 
+        }),
+        { status: 401, headers: { 'Content-Type': 'application/json' } }
+      );
     }
 
     const body = await request.json();
@@ -22,7 +33,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       );
     }
 
-    const userId = pb.authStore.model?.id;
+    const userId = pb.authStore.model.id;
 
     // Créer les données à sauvegarder
     const dataToSave: any = {
@@ -30,12 +41,8 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       prompt,
       code,
       date: new Date().toISOString(),
+      user: userId // L'utilisateur est toujours ajouté
     };
-
-    // Ajouter l'utilisateur seulement si connecté
-    if (userId) {
-      dataToSave.user = userId;
-    }
 
     // Sauvegarder dans la collection svgIA
     const record = await pb.collection('svgIA').create(dataToSave);

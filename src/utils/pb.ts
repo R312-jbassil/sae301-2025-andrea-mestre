@@ -124,6 +124,17 @@ export async function getAllLunettes(page = 1, perPage = 50) {
 // Mettre à jour une lunette
 export async function updateLunette(id: string, data: Partial<LunetteData>) {
   try {
+    // Vérifier si l'utilisateur est connecté
+    if (!pb.authStore.isValid || !pb.authStore.model) {
+      return { success: false, error: 'Vous devez être connecté pour modifier une lunette.' };
+    }
+
+    // Vérifier que l'utilisateur est propriétaire
+    const existingRecord = await pb.collection('lunette').getOne(id);
+    if (existingRecord.user !== pb.authStore.model.id) {
+      return { success: false, error: 'Vous n\'êtes pas autorisé à modifier cette lunette.' };
+    }
+
     const record = await pb.collection('lunette').update(id, data);
     return { success: true, data: record };
   } catch (error: any) {
@@ -135,6 +146,17 @@ export async function updateLunette(id: string, data: Partial<LunetteData>) {
 // Supprimer une lunette
 export async function deleteLunette(id: string) {
   try {
+    // Vérifier si l'utilisateur est connecté
+    if (!pb.authStore.isValid || !pb.authStore.model) {
+      return { success: false, error: 'Vous devez être connecté pour supprimer une lunette.' };
+    }
+
+    // Vérifier que l'utilisateur est propriétaire
+    const record = await pb.collection('lunette').getOne(id);
+    if (record.user !== pb.authStore.model.id) {
+      return { success: false, error: 'Vous n\'êtes pas autorisé à supprimer cette lunette.' };
+    }
+
     await pb.collection('lunette').delete(id);
     return { success: true };
   } catch (error: any) {
@@ -143,10 +165,20 @@ export async function deleteLunette(id: string) {
   }
 }
 
-// Supprimer toutes les lunettes (utilisé pour "Tout supprimer")
+// Supprimer toutes les lunettes de l'utilisateur connecté (utilisé pour "Tout supprimer")
 export async function deleteAllLunettes() {
   try {
-    const lunettes = await pb.collection('lunette').getFullList();
+    // Vérifier si l'utilisateur est connecté
+    if (!pb.authStore.isValid || !pb.authStore.model) {
+      return { success: false, error: 'Vous devez être connecté pour supprimer vos lunettes.' };
+    }
+
+    // Récupérer UNIQUEMENT les lunettes de l'utilisateur connecté
+    const lunettes = await pb.collection('lunette').getFullList({
+      filter: `user = "${pb.authStore.model.id}"`
+    });
+    
+    // Supprimer toutes les lunettes de l'utilisateur
     const promises = lunettes.map((lunette: any) => pb.collection('lunette').delete(lunette.id));
     await Promise.all(promises);
     return { success: true, count: lunettes.length };

@@ -3,6 +3,19 @@ import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import pb from '../utils/pb';
 
+// Charger l'authentification depuis les cookies
+const authCookie = Astro.cookies.get('pb_auth');
+if (authCookie?.value) {
+  try {
+    const authData = JSON.parse(decodeURIComponent(authCookie.value));
+    if (authData.token && authData.model) {
+      pb.authStore.save(authData.token, authData.model);
+    }
+  } catch (e) {
+    console.error('Erreur lors du chargement de l\'authentification:', e);
+  }
+}
+
 // Vérifier si l'utilisateur est connecté
 const isAuthenticated = pb.authStore.isValid;
 const user = pb.authStore.model;
@@ -325,6 +338,15 @@ if (isAuthenticated && user) {
         const data = await response.json();
 
         if (!response.ok) {
+          // Si l'utilisateur n'est pas connecté, le rediriger
+          if (response.status === 401 && data.requireAuth) {
+            if (confirm('Vous devez être connecté pour sauvegarder vos créations. Voulez-vous vous connecter maintenant ?')) {
+              window.location.href = '/connexion?redirect=/lunettes-ia';
+            }
+            saveBtn.disabled = false;
+            saveBtnText.innerHTML = originalContent;
+            return;
+          }
           throw new Error(data.error || 'Erreur lors de la sauvegarde');
         }
 
