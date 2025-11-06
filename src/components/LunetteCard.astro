@@ -41,7 +41,7 @@ const formatDate = (dateString?: string) => {
 };
 ---
 
-<div class="block relative bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-200 transition-all duration-300 no-underline text-inherit h-full hover:shadow-xl lunette-card">
+<div class="block relative bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-200 transition-all duration-300 no-underline text-inherit h-full hover:shadow-xl lunette-card" data-id={id}>
   <!-- Date badge en haut à droite -->
   {created && (
     <div class="absolute top-4 right-4 bg-gray-800 text-white px-3 py-1 rounded-full text-[0.65rem] font-medium z-10">
@@ -49,8 +49,8 @@ const formatDate = (dateString?: string) => {
     </div>
   )}
   
-  <!-- Image Section avec fond gris clair -->
-  <div class="w-full h-[280px] bg-gray-50 flex items-center justify-center overflow-hidden p-8">
+  <!-- Image Section avec fond gris clair - Cliquable pour voir les détails -->
+  <a href={`/lunette/${id}`} class="w-full h-[280px] bg-gray-50 flex items-center justify-center overflow-hidden p-8 no-underline">
     {isIA && svgCode ? (
       <div class="w-full h-full flex items-center justify-center" set:html={svgCode} />
     ) : image ? (
@@ -66,16 +66,18 @@ const formatDate = (dateString?: string) => {
         </g>
       </svg>
     )}
-  </div>
+  </a>
   
   <!-- Content Section -->
   <div class="p-6">
-    <h3 class="font-body text-xl font-bold text-gray-900 m-0 mb-2 overflow-hidden text-ellipsis whitespace-nowrap card-title">
-      {nom_personnalisation || nom_modele}
-    </h3>
-    <p class="font-subtitle text-sm text-gray-500 m-0 mb-4 card-subtitle">
-      {isIA ? 'Généré par IA' : `Modèle ${nom_modele}`}
-    </p>
+    <a href={`/lunette/${id}`} class="no-underline">
+      <h3 class="font-body text-xl font-bold text-gray-900 m-0 mb-2 overflow-hidden text-ellipsis whitespace-nowrap card-title hover:text-brand-brown transition-colors">
+        {nom_personnalisation || nom_modele}
+      </h3>
+      <p class="font-subtitle text-sm text-gray-500 m-0 mb-4 card-subtitle">
+        {isIA ? 'Généré par IA' : `Modèle ${nom_modele}`}
+      </p>
+    </a>
     
     <!-- Details -->
     {!isIA && (
@@ -158,6 +160,17 @@ const formatDate = (dateString?: string) => {
   
   .lunette-card:hover {
     transform: translateY(-4px);
+  }
+
+  /* Rendre les zones cliquables plus évidentes */
+  .lunette-card a:not(.action-btn) {
+    cursor: pointer;
+  }
+
+  .lunette-card a:not(.action-btn):hover img,
+  .lunette-card a:not(.action-btn):hover svg {
+    transform: scale(1.05);
+    transition: transform 0.3s ease;
   }
 </style>
 
