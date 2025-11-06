@@ -518,10 +518,16 @@ import ChevronSvg from '../assets/chevron.svg?raw';
 		// ===== CHARGER LES MATÉRIAUX DEPUIS POCKETBASE =====
 		async function loadMateriaux() {
 			const container = document.getElementById('materiaux-container');
-			if (!container) return;
+			console.log('🔍 Container trouvé:', container);
+			if (!container) {
+				console.error('❌ Container materiaux-container introuvable!');
+				return;
+			}
 
 			try {
+				console.log('📡 Appel de getMateriaux()...');
 				const result = await getMateriaux();
+				console.log('📦 Résultat reçu:', result);
 				
 				if (result.success && result.data && result.data.length > 0) {
 					// Vider le container
