@@ -32,7 +32,7 @@ const hasCustomization = nom_personnalisation && nom_personnalisation.trim() !==
   class="block relative bg-gray-100 rounded-lg overflow-hidden border border-gray-200 transition-all duration-200 no-underline text-inherit h-full hover:shadow-md"
 >
   <!-- Badge -->
-  <div class="absolute top-3 left-3 bg-[#2A2017] text-white px-3 py-1.5 rounded text-[0.625rem] font-bold tracking-wide uppercase z-10">
+  <div class="absolute top-3 left-3 bg-brand-brown text-white px-3 py-1.5 rounded text-[0.625rem] font-bold tracking-wide uppercase z-10">
     {hasCustomization ? 'MODIFIÉ' : 'STANDARD'}
   </div>
   
@@ -55,7 +55,7 @@ const hasCustomization = nom_personnalisation && nom_personnalisation.trim() !==
   
   <!-- Content Section -->
   <div class="p-4">
-    <h3 class="font-body text-lg font-semibold text-[#2A2017] m-0 mb-1 overflow-hidden text-ellipsis whitespace-nowrap">
+    <h3 class="font-body text-lg font-semibold text-brand-brown m-0 mb-1 overflow-hidden text-ellipsis whitespace-nowrap">
       {nom_personnalisation || nom_modele}
     </h3>
     <p class="font-subtitle text-xs text-gray-600 m-0 mb-3 uppercase tracking-wider">
@@ -71,7 +71,7 @@ const hasCustomization = nom_personnalisation && nom_personnalisation.trim() !==
     
     <!-- Footer: Price + Actions -->
     <div class="flex justify-between items-center pt-3 border-t border-gray-200">
-      <span class="font-body text-xl font-bold text-[#2A2017]">{prix} €</span>
+      <span class="font-body text-xl font-bold text-brand-brown">{prix} €</span>
       
       <div class="flex gap-1.5">
         <button 
@@ -93,7 +93,7 @@ const hasCustomization = nom_personnalisation && nom_personnalisation.trim() !==
           </svg>
         </button>
         <button 
-          class="action-btn delete-btn bg-transparent border border-gray-300 rounded p-1.5 cursor-pointer transition-all duration-200 text-gray-600 flex items-center justify-center hover:bg-[#2A2017] hover:border-[#2A2017] hover:text-white" 
+          class="action-btn delete-btn bg-transparent border border-gray-300 rounded p-1.5 cursor-pointer transition-all duration-200 text-gray-600 flex items-center justify-center hover:bg-brand-brown hover:border-brand-brown hover:text-white" 
           aria-label="Supprimer"
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

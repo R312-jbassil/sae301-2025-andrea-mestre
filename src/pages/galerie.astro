@@ -28,10 +28,10 @@ try {
     <div class="mb-12">
       <!-- Titre et description -->
       <div class="mb-8">
-        <h1 class="font-title text-5xl font-normal tracking-tight text-[#2A2017] mb-4">
+        <h1 class="font-title text-5xl font-normal tracking-tight text-brand-brown mb-4">
           Ma Galerie
         </h1>
-        <p class="font-subtitle text-xs leading-relaxed text-[#2A2017] uppercase tracking-widest">
+        <p class="font-subtitle text-xs leading-relaxed text-brand-brown uppercase tracking-widest">
           Retrouvez toutes vos créations de lunettes personnalisées. Modifiez, visualisez<br>
           ou commandez vos modèles préférés.
         </p>
@@ -40,14 +40,14 @@ try {
       <!-- Actions: Compteur + Search + Delete -->
       <div class="flex gap-4 items-center flex-wrap">
         <!-- Counter Badge -->
-        <div class="flex items-center gap-2 bg-[#2A2017] text-white px-4 py-2.5 rounded">
+        <div class="flex items-center gap-2 bg-brand-brown text-white px-4 py-2.5 rounded">
           <span class="font-body text-xl font-bold">{lunettes.length}</span>
           <span class="font-body text-sm">Paires créées</span>
         </div>
 
         <!-- Search Box -->
-        <div class="flex items-center gap-3 flex-1 min-w-[300px] bg-white border border-[#2A2017] rounded px-4 py-2.5 transition-all duration-200 focus-within:border-[#2A2017]">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="flex-shrink-0 text-[#2A2017]">
+        <div class="flex items-center gap-3 flex-1 min-w-[300px] bg-white border border-brand-brown rounded px-4 py-2.5 transition-all duration-200 focus-within:border-brand-brown">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="shrink-0 text-brand-brown">
             <circle cx="11" cy="11" r="8"></circle>
             <path d="m21 21-4.35-4.35"></path>
           </svg>
@@ -55,14 +55,14 @@ try {
             type="text" 
             id="searchInput" 
             placeholder="Filtrer mes modèles..." 
-            class="border-none outline-none w-full font-body text-sm text-[#2A2017] placeholder:text-gray-600"
+            class="border-none outline-none w-full font-body text-sm text-brand-brown placeholder:text-gray-600"
           />
         </div>
         
         <!-- Delete Button -->
         <button 
           id="deleteAllBtn"
-          class="inline-flex items-center gap-2 bg-[#2A2017] text-white px-5 py-2.5 rounded font-btn text-sm font-medium transition-all duration-200 hover:bg-[#3d2f20] whitespace-nowrap"
+          class="inline-flex items-center gap-2 bg-brand-brown text-white px-5 py-2.5 rounded font-btn text-sm font-medium transition-all duration-200 hover:bg-[#3d2f20] whitespace-nowrap"
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polyline points="3 6 5 6 21 6"></polyline>
@@ -97,7 +97,7 @@ try {
             <line x1="175" y1="40" x2="190" y2="35" />
           </g>
         </svg>
-        <h2 class="font-title text-3xl font-bold text-[#2A2017] m-0 mb-3">
+        <h2 class="font-title text-3xl font-bold text-brand-brown m-0 mb-3">
           Aucune lunette dans votre galerie
         </h2>
         <p class="font-body text-lg text-gray-600 m-0 mb-8">
@@ -105,7 +105,7 @@ try {
         </p>
         <a 
           href="/configurateur" 
-          class="bg-[#2A2017] text-white px-8 py-3 rounded font-btn text-base font-medium no-underline transition-all duration-200 hover:bg-[#3d2f20]"
+          class="bg-brand-brown text-white px-8 py-3 rounded font-btn text-base font-medium no-underline transition-all duration-200 hover:bg-[#3d2f20]"
         >
           Créer mes lunettes
         </a>
