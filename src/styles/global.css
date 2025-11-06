@@ -9,23 +9,11 @@
 
 /* ===== VARIABLES PERSONNALISÉES ===== */
 @theme {
-  /* Couleurs principales */
-  --color-primary: #2563eb; /* Bleu principal */
-  --color-primary-dark: #1e40af;
-  --color-primary-light: #60a5fa;
-  
-  --color-secondary: #7c3aed; /* Violet secondaire */
-  --color-secondary-dark: #5b21b6;
-  --color-secondary-light: #a78bfa;
-  
-  --color-accent: #f59e0b; /* Orange accent */
-  --color-accent-dark: #d97706;
-  --color-accent-light: #fbbf24;
-  
   /* Couleurs brand pour Tailwind */
   --color-brand-brown: #2A2017;
+  --color-brand-brown-dark: #1a1410;
   --color-brand-dark: #1f2937;
-  --color-brand-light: #f5f5f5;
+  --color-brand-light: #9B8B7E;
   
   /* Couleurs de matériaux pour lunettes */
   --color-frame-black: #1f2937;
@@ -35,11 +23,6 @@
   --color-frame-gold: #ca8a04;
   --color-frame-silver: #71717a;
   --color-frame-transparent: #f3f4f6;
-  
-  /* Couleurs UI/Branding */
-  --color-brand-brown: #2A2017; /* Marron principal pour la charte */
-  --color-brand-dark: #1f2937; /* Gris foncé/noir */
-  --color-brand-light: #f5f5f5; /* Gris très clair pour backgrounds */
   
   /* Couleurs verres */
   --color-lens-clear: rgba(255, 255, 255, 0.1);
@@ -72,12 +55,6 @@
   --font-weight-subtitle: 400;
   --letter-spacing-subtitle: 0.15em; /* 15% */
   --line-height-subtitle: 1.41; /* 24px = 141% de 17px */
-  
-  /* btn : Inter Regular 13 / -0.5px */
-  --font-size-btn: 0.8125rem; /* 13px */
-  --font-weight-btn: 400;
-  --letter-spacing-btn: -0.5px; /* -0.5px */
-  --line-height-btn: 1.85; /* 24px = 185% de 13px */
   
   /* Espacements personnalisés */
   --spacing-header: 4rem;
