@@ -1,0 +1,11 @@
+URL Application : https://sae301lunette.andrea-mestre.eu/
+
+URL Github : https://github.com/R312-jbassil/sae301-2025-andrea-mestre.git
+
+
+COmpte pocketbase VPS : https://sae301lunette.andrea-mestre.eu/_/#/collections?collection=_pb_users_auth_&filter=&sort=-%40rowid
+
+identifiant pour le pocketbase VPS et Local :
+ 
+mail : andrea.mestre@edu.univ-fcomte.fr
+Mot de passe : sae301AndreaMestre

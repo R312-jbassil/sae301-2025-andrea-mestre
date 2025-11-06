@@ -1,0 +1,10 @@
+UTILISATEUR 1 : 
+
+
+mail étudiant : andrea.mestre@edu.univ-fcomte.fr
+mot de passe : sae301pocketbase
+
+UTILISATEUR 2 :
+
+mail étudiant : bryan.thierry@edu.univ-fcomte.fr
+mot de passe : 123456456789
