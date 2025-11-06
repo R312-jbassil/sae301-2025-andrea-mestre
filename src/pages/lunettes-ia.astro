@@ -1,0 +1,391 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import pb from '../utils/pb';
+
+// Vérifier si l'utilisateur est connecté
+const isAuthenticated = pb.authStore.isValid;
+const user = pb.authStore.model;
+
+// Récupérer les lunettes IA de l'utilisateur si connecté
+let lunettesIA: any[] = [];
+if (isAuthenticated && user) {
+  try {
+    lunettesIA = await pb.collection('svgIA').getFullList({
+      filter: `user = "${user.id}"`,
+      sort: '-created',
+    });
+  } catch (error) {
+    console.error('Erreur lors de la récupération des lunettes IA:', error);
+  }
+}
+---
+
+<Layout title="Générateur de Lunettes IA - TAVUE">
+  <Header />
+  
+  <main class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-r from-brand-brown to-[#1a1410] text-white py-16">
+      <div class="max-w-7xl mx-auto px-6">
+        <div class="text-center">
+          <h1 class="text-5xl font-bold mb-4">Générateur de Lunettes IA</h1>
+          <p class="text-xl text-gray-200 mb-8">
+            Créez des designs uniques de lunettes grâce à l'intelligence artificielle
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <div class="max-w-7xl mx-auto px-6 py-12">
+      <div class="grid lg:grid-cols-2 gap-8">
+        
+        <!-- Section Génération -->
+        <div class="bg-white rounded-2xl shadow-xl p-8">
+          <h2 class="text-2xl font-bold mb-6 flex items-center gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-brand-brown" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+            </svg>
+            Créer des Lunettes
+          </h2>
+
+          {!isAuthenticated ? (
+            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+              <div class="flex">
+                <div class="flex-shrink-0">
+                  <svg class="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                  </svg>
+                </div>
+                <div class="ml-3">
+                  <p class="text-sm text-yellow-700">
+                    💡 Vous pouvez générer des lunettes sans être connecté. 
+                    Pour les sauvegarder dans votre galerie, 
+                    <a href="/connexion" class="font-medium underline hover:text-yellow-600">connectez-vous</a>.
+                  </p>
+                </div>
+              </div>
+            </div>
+          ) : null}
+
+          <form id="ia-form" class="space-y-6">
+            <div>
+              <label for="prompt" class="block text-sm font-semibold text-gray-700 mb-2">
+                Décrivez vos lunettes *
+              </label>
+              <textarea
+                id="prompt"
+                name="prompt"
+                rows="8"
+                required
+                placeholder="Décrivez les lunettes que vous souhaitez créer...&#10;&#10;Exemples:&#10;- Lunettes de soleil rondes avec monture dorée et verres dégradés bleus&#10;- Lunettes de vue rectangulaires style vintage avec branches en bois&#10;- Lunettes de sport futuristes avec monture noire et détails fluo"
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-brown focus:border-transparent transition-all resize-none"
+              ></textarea>
+              <p class="mt-2 text-xs text-gray-500">
+                💡 Astuce: Soyez précis sur les couleurs, formes et styles souhaités
+              </p>
+            </div>
+
+            <button
+              type="submit"
+              id="generate-btn"
+              class="w-full bg-brand-brown text-white px-6 py-4 rounded-lg font-semibold text-lg hover:bg-[#1a1410] transition-all disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              Générer avec l'IA
+            </button>
+          </form>
+
+          <div id="loading" class="hidden mt-6">
+            <div class="flex items-center justify-center gap-3 text-brand-brown">
+              <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-brown"></div>
+              <span class="font-medium">Génération en cours...</span>
+            </div>
+          </div>
+
+          <div id="success" class="hidden mt-6 bg-green-50 border-l-4 border-green-400 p-4">
+            <div class="flex">
+              <svg class="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+              </svg>
+              <div class="ml-3">
+                <p class="text-sm text-green-700">✨ Lunettes générées avec succès !</p>
+              </div>
+            </div>
+          </div>
+
+          <div id="error" class="hidden mt-6 bg-red-50 border-l-4 border-red-400 p-4">
+            <div class="flex">
+              <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+              </svg>
+              <div class="ml-3">
+                <p class="text-sm text-red-700" id="error-message"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section Prévisualisation -->
+        <div class="bg-white rounded-2xl shadow-xl p-8">
+          <h2 class="text-2xl font-bold mb-6 flex items-center gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-brand-brown" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+            Prévisualisation
+          </h2>
+
+          <div id="preview-container" class="relative w-full h-96 bg-gray-50 rounded-xl flex items-center justify-center border-2 border-dashed border-gray-300">
+            <div id="preview-placeholder" class="text-center text-gray-400">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-20 h-20 mx-auto mb-4 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              <p class="text-lg font-medium">Votre création apparaîtra ici</p>
+            </div>
+            <div id="preview-svg" class="hidden w-full h-full p-8"></div>
+          </div>
+
+          <div id="save-section" class="hidden mt-6 space-y-4">
+            <button
+              id="save-btn"
+              class="w-full bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition-all flex items-center justify-center gap-2"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+              </svg>
+              <span id="save-btn-text">Sauvegarder dans ma galerie</span>
+            </button>
+
+            <div class="flex gap-2">
+              <button
+                id="regenerate-btn"
+                class="flex-1 bg-gray-100 text-gray-700 px-6 py-3 rounded-lg font-semibold hover:bg-gray-200 transition-all flex items-center justify-center gap-2"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Régénérer
+              </button>
+
+              <button
+                id="download-btn"
+                class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-all flex items-center justify-center gap-2"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                Télécharger SVG
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section Mes Créations IA -->
+      {isAuthenticated && lunettesIA.length > 0 && (
+        <section class="mt-16">
+          <h2 class="text-3xl font-bold mb-8 flex items-center gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-brand-brown" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+            </svg>
+            Mes Créations IA ({lunettesIA.length})
+          </h2>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {lunettesIA.map((lunette) => (
+              <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all group">
+                <div class="aspect-square bg-gray-50 p-6 flex items-center justify-center">
+                  <div class="w-full h-full" set:html={lunette.code} />
+                </div>
+                <div class="p-4">
+                  <h3 class="font-bold text-lg mb-2 text-gray-800">{lunette.nom}</h3>
+                  <p class="text-sm text-gray-600 mb-3 line-clamp-2">{lunette.prompt}</p>
+                  <div class="flex gap-2 text-xs text-gray-500">
+                    <span>📅 {new Date(lunette.created).toLocaleDateString('fr-FR')}</span>
+                  </div>
+                  <div class="mt-4 flex gap-2">
+                    <button
+                      class="flex-1 bg-brand-brown text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#1a1410] transition-all"
+                      onclick={`window.location.href='/lunette/${lunette.id}'`}
+                    >
+                      Voir détails
+                    </button>
+                    <button
+                      class="delete-ia-btn px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-all"
+                      data-id={lunette.id}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+    </div>
+  </main>
+
+  <style>
+    .line-clamp-2 {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+  </style>
+
+  <script>
+    let currentSvgCode = '';
+    let currentPrompt = '';
+
+    const form = document.getElementById('ia-form') as HTMLFormElement;
+    const generateBtn = document.getElementById('generate-btn') as HTMLButtonElement;
+    const loading = document.getElementById('loading') as HTMLDivElement;
+    const successDiv = document.getElementById('success') as HTMLDivElement;
+    const errorDiv = document.getElementById('error') as HTMLDivElement;
+    const errorMessage = document.getElementById('error-message') as HTMLParagraphElement;
+    const previewPlaceholder = document.getElementById('preview-placeholder') as HTMLDivElement;
+    const previewSvg = document.getElementById('preview-svg') as HTMLDivElement;
+    const saveSection = document.getElementById('save-section') as HTMLDivElement;
+    const saveBtn = document.getElementById('save-btn') as HTMLButtonElement;
+    const saveBtnText = document.getElementById('save-btn-text') as HTMLSpanElement;
+    const regenerateBtn = document.getElementById('regenerate-btn') as HTMLButtonElement;
+    const downloadBtn = document.getElementById('download-btn') as HTMLButtonElement;
+
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const prompt = (document.getElementById('prompt') as HTMLTextAreaElement).value;
+
+      currentPrompt = prompt;
+
+      // Reset UI
+      errorDiv.classList.add('hidden');
+      successDiv.classList.add('hidden');
+      previewPlaceholder.classList.remove('hidden');
+      previewSvg.classList.add('hidden');
+      saveSection.classList.add('hidden');
+
+      // Show loading
+      loading.classList.remove('hidden');
+      generateBtn.disabled = true;
+
+      try {
+        const response = await fetch('/api/generateLunetteIA', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt }),
+        });
+        
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Erreur lors de la génération');
+        }
+
+        // Afficher le SVG
+        currentSvgCode = data.svg;
+        previewSvg.innerHTML = currentSvgCode;
+        previewPlaceholder.classList.add('hidden');
+        previewSvg.classList.remove('hidden');
+        saveSection.classList.remove('hidden');
+        successDiv.classList.remove('hidden');
+
+      } catch (error: any) {
+        errorMessage.textContent = error.message;
+        errorDiv.classList.remove('hidden');
+      } finally {
+        loading.classList.add('hidden');
+        generateBtn.disabled = false;
+      }
+    });
+
+    saveBtn?.addEventListener('click', async () => {
+      saveBtn.disabled = true;
+      const originalContent = saveBtnText.innerHTML;
+      saveBtnText.innerHTML = 'Sauvegarde...';
+
+      try {
+        const response = await fetch('/api/saveLunetteIA', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            nom: 'Lunettes IA ' + new Date().toLocaleString('fr-FR'),
+            prompt: currentPrompt,
+            code: currentSvgCode,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Erreur lors de la sauvegarde');
+        }
+
+        // Succès
+        saveBtnText.innerHTML = '✅ Sauvegardé !';
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+
+      } catch (error: any) {
+        alert('❌ Erreur: ' + error.message);
+        saveBtn.disabled = false;
+        saveBtnText.innerHTML = originalContent;
+      }
+    });
+
+    downloadBtn?.addEventListener('click', () => {
+      // Créer un blob avec le SVG
+      const blob = new Blob([currentSvgCode], { type: 'image/svg+xml' });
+      const url = URL.createObjectURL(blob);
+      
+      // Créer un lien de téléchargement
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `lunettes-${Date.now()}.svg`;
+      document.body.appendChild(a);
+      a.click();
+      
+      // Nettoyer
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+
+    regenerateBtn?.addEventListener('click', () => {
+      form?.requestSubmit();
+    });
+
+    // Supprimer une lunette IA
+    document.querySelectorAll('.delete-ia-btn').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        const target = e.currentTarget as HTMLButtonElement;
+        const id = target.dataset.id;
+        
+        if (!confirm('Voulez-vous vraiment supprimer cette création ?')) return;
+
+        try {
+          const response = await fetch('/api/deleteLunetteIA', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id }),
+          });
+
+          if (!response.ok) {
+            throw new Error('Erreur lors de la suppression');
+          }
+
+          window.location.reload();
+        } catch (error: any) {
+          alert('❌ Erreur: ' + error.message);
+        }
+      });
+    });
+  </script>
+</Layout>

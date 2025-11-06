@@ -52,10 +52,10 @@ import ChevronSvg from '../assets/chevron.svg?raw';
 					<span class="flex items-center justify-center w-[18px] h-[18px]" set:html={Icon3dSvg}></span>
 					Voir en 3D
 				</button>
-				<button class="flex items-center gap-2 px-6 py-3 bg-brand-brown text-white rounded-full text-sm font-medium hover:bg-[#1a1410] hover:-translate-y-0.5 hover:shadow-lg transition-all">
+				<a href="/lunettes-ia" class="flex items-center gap-2 px-6 py-3 bg-brand-brown text-white rounded-full text-sm font-medium hover:bg-[#1a1410] hover:-translate-y-0.5 hover:shadow-lg transition-all no-underline">
 					<span class="flex items-center justify-center w-[18px] h-[18px]" set:html={IaSvg}></span>
 					Générer par IA
-				</button>
+				</a>
 			</div>
 
 			<!-- Container pour les lunettes SVG -->
@@ -241,10 +241,25 @@ import ChevronSvg from '../assets/chevron.svg?raw';
 					</div>
 				</div>
 
-				<!-- Étape 5: ÉTUI -->
+				<!-- Étape 5: MATÉRIAUX -->
 				<div id="step-5" class="border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-shadow scroll-mt-24">
 					<div class="flex items-center justify-between px-6 py-4 bg-white cursor-pointer hover:bg-gray-50 transition-colors">
-						<span class="font-semibold tracking-wide text-lg" style="font-family: var(--font-subtitle);">5. ÉTUI</span>
+						<span class="font-semibold tracking-wide text-lg" style="font-family: var(--font-subtitle);">5. MATÉRIAUX</span>
+					</div>
+					<div class="px-6 py-6 bg-gray-50 border-t border-gray-200">
+						<div id="materiaux-container" class="grid grid-cols-2 gap-6">
+							<!-- Les matériaux seront chargés dynamiquement ici -->
+							<div class="col-span-2 text-center text-gray-500 py-4">
+								<p style="font-family: var(--font-body);">Chargement des matériaux...</p>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Étape 6: ÉTUI -->
+				<div id="step-6" class="border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-shadow scroll-mt-24">
+					<div class="flex items-center justify-between px-6 py-4 bg-white cursor-pointer hover:bg-gray-50 transition-colors">
+						<span class="font-semibold tracking-wide text-lg" style="font-family: var(--font-subtitle);">6. ÉTUI</span>
 					</div>
 					<div class="px-6 py-6 bg-gray-50 border-t border-gray-200">
 						<div class="grid grid-cols-2 gap-6">
@@ -308,10 +323,77 @@ import ChevronSvg from '../assets/chevron.svg?raw';
 		border-color: black !important;
 		border-radius: 0.5rem !important;
 	}
+
+	.materiau-btn.active {
+		border-color: #2d2d2d !important;
+		border-width: 3px !important;
+		background-color: #f9fafb !important;
+		animation: selectMateriau 0.3s ease-out;
+	}
+
+	@keyframes selectMateriau {
+		0% {
+			transform: scale(1);
+		}
+		50% {
+			transform: scale(1.05);
+		}
+		100% {
+			transform: scale(1);
+		}
+	}
+
+	.materiau-btn {
+		transition: all 0.3s ease;
+	}
+
+	.materiau-btn:hover {
+		transform: translateY(-4px);
+		box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+	}
+
+	.materiau-btn:active {
+		transform: translateY(-2px) scale(0.98);
+	}
+
+	@keyframes pulsePrix {
+		0% {
+			transform: scale(1);
+		}
+		50% {
+			transform: scale(1.1);
+			color: #f59e0b;
+		}
+		100% {
+			transform: scale(1);
+		}
+	}
+
+	.price-animation {
+		animation: pulsePrix 0.5s ease-out;
+	}
+
+	@keyframes popIn {
+		0% {
+			transform: scale(0);
+			opacity: 0;
+		}
+		50% {
+			transform: scale(1.2);
+		}
+		100% {
+			transform: scale(1);
+			opacity: 1;
+		}
+	}
+
+	.checkmark-icon:not(.hidden) {
+		animation: popIn 0.3s ease-out;
+	}
 </style>
 
 <script>
-	import { createLunette, updateLunette, getLunette, isUserAuthenticated, type LunetteData } from '../utils/pb';
+	import { createLunette, updateLunette, getLunette, isUserAuthenticated, getMateriaux, type LunetteData, type MateriauData } from '../utils/pb';
 
 	// ===== GESTION DES INTERACTIONS =====
 	
@@ -327,6 +409,9 @@ import ChevronSvg from '../assets/chevron.svg?raw';
 		templeColor: '#1D1D1B',
 		case: 'soft',
 		price: 146,
+		basePrix: 146, // Prix de base sans matériau
+		materiau: null as string | null, // ID du matériau sélectionné
+		materiauPrix: 0, // Prix du matériau
 		lunetteId: null as string | null // Pour stocker l'ID si on édite une lunette existante
 	};
 
@@ -405,21 +490,110 @@ import ChevronSvg from '../assets/chevron.svg?raw';
 			return;
 		}
 
-		// Cibler les éléments du SVG (les paths avec fill="white" sont les parties modifiables)
-		const framePaths = svg.querySelectorAll('path[fill="white"]');
-		const strokePaths = svg.querySelectorAll('path[stroke="#1D1D1B"]');
+		// Cibler les éléments SPÉCIFIQUES du SVG
+		const allPaths = svg.querySelectorAll('path[stroke="#1D1D1B"]');
+		
+		// Les 2 premiers paths sont les branches (haut gauche et haut droit)
+		const leftTemple = allPaths[0];
+		const rightTemple = allPaths[1];
+		
+		// Le dernier grand path est la monture complète (verres + cercles)
+		const mainFrame = allPaths[allPaths.length - 1];
+		
+		// Créer un groupe pour pouvoir manipuler fill et stroke séparément
+		// On va dupliquer le mainFrame pour avoir un contrôle séparé
+		const frameClone = mainFrame.cloneNode(true) as SVGPathElement;
+		frameClone.setAttribute('id', 'frame-fill-layer');
+		frameClone.setAttribute('stroke', 'none'); // Pas de stroke pour cette couche
+		mainFrame.parentNode?.insertBefore(frameClone, mainFrame);
+
+		console.log('✅ SVG chargé:', {
+			totalPaths: allPaths.length,
+			leftTemple,
+			rightTemple,
+			mainFrame,
+			frameClone
+		});
+
+		// ===== CHARGER LES MATÉRIAUX DEPUIS POCKETBASE =====
+		async function loadMateriaux() {
+			const container = document.getElementById('materiaux-container');
+			if (!container) return;
+
+			try {
+				const result = await getMateriaux();
+				
+				if (result.success && result.data && result.data.length > 0) {
+					// Vider le container
+					container.innerHTML = '';
+					
+					// Créer un bouton pour chaque matériau
+					result.data.forEach((materiau: MateriauData) => {
+						const button = document.createElement('button');
+						button.className = 'materiau-btn flex flex-col items-center gap-3 cursor-pointer transition-all hover:scale-105 p-4 border-2 border-gray-200 rounded-lg hover:border-gray-400 relative';
+						button.setAttribute('data-materiau-id', materiau.id);
+						button.setAttribute('data-materiau-prix', materiau.prix.toString());
+						button.setAttribute('title', materiau.libelle);
+						
+						button.innerHTML = `
+							<div class="checkmark-icon hidden absolute top-2 right-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+									<polyline points="20 6 9 17 4 12"></polyline>
+								</svg>
+							</div>
+							<div class="w-full text-center">
+								<p class="text-base font-semibold mb-2" style="font-family: var(--font-subtitle);">${materiau.libelle}</p>
+								<p class="text-2xl font-bold text-brand-brown" style="font-family: var(--font-title);">+${materiau.prix} €</p>
+							</div>
+						`;
+						
+						container.appendChild(button);
+					});
+					
+					console.log('✅ Matériaux chargés:', result.data.length);
+				} else {
+					container.innerHTML = '<div class="col-span-2 text-center text-gray-500 py-4"><p style="font-family: var(--font-body);">Aucun matériau disponible</p></div>';
+				}
+			} catch (error) {
+				console.error('❌ Erreur lors du chargement des matériaux:', error);
+				container.innerHTML = '<div class="col-span-2 text-center text-red-500 py-4"><p style="font-family: var(--font-body);">Erreur de chargement</p></div>';
+			}
+		}
+
+		// Fonction pour mettre à jour le prix total
+		function updateTotalPrice() {
+			config.price = config.basePrix + config.materiauPrix;
+			const priceDisplay = document.getElementById('price-display');
+			if (priceDisplay) {
+				priceDisplay.textContent = `${config.price} €`;
+				
+				// Ajouter l'animation
+				priceDisplay.classList.remove('price-animation');
+				void priceDisplay.offsetWidth; // Force reflow pour redémarrer l'animation
+				priceDisplay.classList.add('price-animation');
+				
+				// Retirer la classe après l'animation
+				setTimeout(() => {
+					priceDisplay.classList.remove('price-animation');
+				}, 500);
+			}
+			console.log('💰 Prix mis à jour:', config.price, '€ (base:', config.basePrix, '+ matériau:', config.materiauPrix, ')');
+		}
 
 		// ===== FONCTIONS DE MISE À JOUR DU SVG =====
-	function updateGlassesSize(sizeIndex: number) {
-		config.sizeIndex = sizeIndex;
-		config.sizeValue = sizes[sizeIndex].value;
+		function updateGlassesSize(sizeIndex: number) {
+			config.sizeIndex = sizeIndex;
+			config.sizeValue = sizes[sizeIndex].value;
 
-		// Mettre à jour uniquement l'affichage de la valeur
-		const sizeValue = document.getElementById('size-value');
-		if (sizeValue) sizeValue.textContent = config.sizeValue;
-	}		function updateLensType(type: string) {
-			if (!framePaths || framePaths.length === 0) return;
-
+			// Mettre à jour uniquement l'affichage de la valeur
+			const sizeValue = document.getElementById('size-value');
+			if (sizeValue) sizeValue.textContent = config.sizeValue;
+		}
+		
+		function updateLensType(type: string) {
+			// Modifier la couleur de REMPLISSAGE des VERRES (couche clonée)
+			if (!frameClone) return;
+			
 			const lensStyles = {
 				'clear': { fill: 'rgba(255, 255, 255, 0.95)', opacity: '0.5' },
 				'glass': { fill: 'rgba(200, 220, 255, 0.3)', opacity: '0.6' },
@@ -428,44 +602,55 @@ import ChevronSvg from '../assets/chevron.svg?raw';
 
 			const style = lensStyles[type as keyof typeof lensStyles];
 			if (style) {
-				// Les deux premiers paths sont les verres (left et right lens)
-				framePaths.forEach((path) => {
-					path.setAttribute('fill', style.fill);
-					path.setAttribute('fill-opacity', style.opacity);
-				});
+				frameClone.setAttribute('fill', style.fill);
+				frameClone.setAttribute('fill-opacity', style.opacity);
 				config.lenses = type;
+				console.log('✅ Verres mis à jour:', type, style);
 			}
 		}
 
 		function updateFrameColor(color: string) {
-			if (!strokePaths || strokePaths.length === 0) return;
-
-			// Modifier la couleur du contour
-			strokePaths.forEach((path) => {
-				path.setAttribute('stroke', color);
-			});
+			// Modifier la couleur du CONTOUR des CERCLES (stroke du mainFrame)
+			if (!mainFrame) return;
+			
+			mainFrame.setAttribute('stroke', color);
+			mainFrame.setAttribute('stroke-width', '3'); // Augmenter pour être plus visible
 			
 			config.frameColor = color;
+			console.log('✅ Cercles mis à jour:', color);
 		}
 
 		function updateTempleColor(color: string) {
-			if (!strokePaths || strokePaths.length === 0) return;
-
-			// Modifier la couleur des branches (temples)
-			strokePaths.forEach((path, index) => {
-				// Les branches sont généralement les derniers paths
-				if (index >= strokePaths.length - 2) {
-					if (color === 'transparent') {
-						path.setAttribute('stroke', '#d1d5db');
-						path.setAttribute('stroke-dasharray', '5,5');
-					} else {
-						path.setAttribute('stroke', color);
-						path.setAttribute('stroke-dasharray', '0');
-					}
-				}
-			});
+			// Modifier la couleur de REMPLISSAGE des BRANCHES
+			if (!leftTemple || !rightTemple) return;
+			
+			if (color === 'transparent') {
+				leftTemple.setAttribute('fill', 'rgba(255, 255, 255, 0.1)');
+				leftTemple.setAttribute('stroke', '#d1d5db');
+				leftTemple.setAttribute('stroke-dasharray', '5,5');
+				rightTemple.setAttribute('fill', 'rgba(255, 255, 255, 0.1)');
+				rightTemple.setAttribute('stroke', '#d1d5db');
+				rightTemple.setAttribute('stroke-dasharray', '5,5');
+			} else if (color === '#92400e') {
+				// Havane - texture spéciale
+				leftTemple.setAttribute('fill', color);
+				leftTemple.setAttribute('stroke', color);
+				leftTemple.setAttribute('stroke-dasharray', '0');
+				rightTemple.setAttribute('fill', color);
+				rightTemple.setAttribute('stroke', color);
+				rightTemple.setAttribute('stroke-dasharray', '0');
+			} else {
+				// Couleurs unies
+				leftTemple.setAttribute('fill', color);
+				leftTemple.setAttribute('stroke', color);
+				leftTemple.setAttribute('stroke-dasharray', '0');
+				rightTemple.setAttribute('fill', color);
+				rightTemple.setAttribute('stroke', color);
+				rightTemple.setAttribute('stroke-dasharray', '0');
+			}
 			
 			config.templeColor = color;
+			console.log('✅ Branches mises à jour:', color);
 		}
 
 		// ===== GESTION DES BOUTONS DE TAILLE =====
@@ -565,6 +750,51 @@ import ChevronSvg from '../assets/chevron.svg?raw';
 			});
 		});
 
+		// ===== GESTION DES MATÉRIAUX (avec délégation d'événements) =====
+		document.addEventListener('click', (e) => {
+			const target = e.target as HTMLElement;
+			const materiauBtn = target.closest('.materiau-btn') as HTMLElement;
+			
+			if (materiauBtn) {
+				const materiauId = materiauBtn.getAttribute('data-materiau-id');
+				const materiauPrix = parseFloat(materiauBtn.getAttribute('data-materiau-prix') || '0');
+				
+				if (materiauId) {
+					// Mettre à jour l'état actif
+					document.querySelectorAll('.materiau-btn').forEach(b => {
+						b.classList.remove('active');
+						b.classList.remove('border-brand-brown');
+						b.classList.add('border-gray-200');
+						// Cacher toutes les icônes de checkmark
+						const checkmark = b.querySelector('.checkmark-icon');
+						if (checkmark) {
+							checkmark.classList.add('hidden');
+							checkmark.classList.remove('flex');
+						}
+					});
+					materiauBtn.classList.add('active');
+					materiauBtn.classList.remove('border-gray-200');
+					materiauBtn.classList.add('border-brand-brown');
+					
+					// Afficher l'icône de checkmark pour le bouton sélectionné
+					const checkmark = materiauBtn.querySelector('.checkmark-icon');
+					if (checkmark) {
+						checkmark.classList.remove('hidden');
+						checkmark.classList.add('flex');
+					}
+					
+					// Mettre à jour la config
+					config.materiau = materiauId;
+					config.materiauPrix = materiauPrix;
+					
+					// Mettre à jour le prix total
+					updateTotalPrice();
+					
+					console.log('✅ Matériau sélectionné:', materiauId, '+', materiauPrix, '€');
+				}
+			}
+		});
+
 		// ===== GESTION DE L'EXPANSION DES SECTIONS =====
 		document.querySelectorAll('.step-header').forEach(header => {
 			header.addEventListener('click', (e) => {
@@ -589,6 +819,9 @@ import ChevronSvg from '../assets/chevron.svg?raw';
 			templeColor: '#1D1D1B',
 			case: 'soft',
 			price: 146,
+			basePrix: 146,
+			materiau: null,
+			materiauPrix: 0,
 			lunetteId: null
 		};
 		
@@ -719,13 +952,14 @@ import ChevronSvg from '../assets/chevron.svg?raw';
 				nom_modele: config.nom_modele,
 				nom_personnalisation: nomPersonnalisation || `${config.nom_modele} - ${new Date().toLocaleDateString()}`,
 				prix: config.price,
-				description: `Verres: ${config.lenses}, Cercles: ${config.frameColor}, Branches: ${config.templeColor}, Étui: ${config.case}`,
+				description: `Verres: ${config.lenses}, Cercles: ${config.frameColor}, Branches: ${config.templeColor}, Étui: ${config.case}${config.materiau ? ', Matériau: ajouté' : ''}`,
 				taille: tailleNumber,
 				verres: config.lenses,
 				cercles: config.frameColor,
 				branches: config.templeColor,
 				etui: config.case,
-				origine_lunette: 'configurateur'
+				origine_lunette: 'configurateur',
+				materiau: config.materiau || undefined // Ajouter le matériau si sélectionné
 			};
 
 		// Sauvegarder dans PocketBase
@@ -937,6 +1171,9 @@ import ChevronSvg from '../assets/chevron.svg?raw';
 		updateFrameColor('#1D1D1B');
 		updateTempleColor('#1D1D1B');
 		updateGlassesSize(0);
+		
+		// Charger les matériaux
+		loadMateriaux();
 		
 		// Initialiser le libellé des verres par défaut
 		const defaultLensRadio = document.querySelector('input[name="lenses"][value="clear"]') as HTMLInputElement;

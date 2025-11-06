@@ -45,6 +45,16 @@ export interface LunetteData {
   etui?: string;
   origine_lunette?: string;
   user?: string; // ID de l'utilisateur propriétaire
+  materiau?: string; // ID du matériau choisi (relation)
+}
+
+// Interface pour les matériaux
+export interface MateriauData {
+  id: string;
+  libelle: string;
+  prix: number;
+  created?: string;
+  updated?: string;
 }
 
 // Créer une nouvelle lunette (nécessite une connexion)
@@ -142,6 +152,126 @@ export async function deleteAllLunettes() {
     return { success: true, count: lunettes.length };
   } catch (error: any) {
     console.error('Erreur lors de la suppression de toutes les lunettes:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+// ===== FONCTIONS POUR LA COLLECTION SVGIA (Lunettes générées par IA) =====
+
+export interface SvgIAData {
+  nom: string;
+  prompt: string;
+  code: string;
+  user?: string;
+  date?: string;
+}
+
+// Créer une lunette IA
+export async function createSvgIA(data: SvgIAData) {
+  try {
+    if (!pb.authStore.isValid || !pb.authStore.model) {
+      return { success: false, error: 'Vous devez être connecté.' };
+    }
+
+    const svgData = {
+      ...data,
+      user: pb.authStore.model.id,
+      date: data.date || new Date().toISOString(),
+    };
+
+    const record = await pb.collection('svgIA').create(svgData);
+    return { success: true, data: record };
+  } catch (error: any) {
+    console.error('Erreur lors de la création de la lunette IA:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+// Récupérer toutes les lunettes IA de l'utilisateur
+export async function getAllSvgIA(page = 1, perPage = 50) {
+  try {
+    if (!pb.authStore.isValid || !pb.authStore.model) {
+      return { success: false, error: 'Vous devez être connecté.' };
+    }
+
+    const resultList = await pb.collection('svgIA').getList(page, perPage, {
+      sort: '-created',
+      filter: `user = "${pb.authStore.model.id}"`
+    });
+    return { success: true, data: resultList.items, totalPages: resultList.totalPages };
+  } catch (error: any) {
+    console.error('Erreur lors de la récupération des lunettes IA:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+// Récupérer une lunette IA par ID
+export async function getSvgIA(id: string) {
+  try {
+    if (!pb.authStore.isValid || !pb.authStore.model) {
+      return { success: false, error: 'Vous devez être connecté.' };
+    }
+
+    const record = await pb.collection('svgIA').getOne(id);
+    
+    if (record.user !== pb.authStore.model.id) {
+      return { success: false, error: 'Vous n\'avez pas accès à cette lunette.' };
+    }
+    
+    return { success: true, data: record };
+  } catch (error: any) {
+    console.error('Erreur lors de la récupération de la lunette IA:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+// Supprimer une lunette IA
+export async function deleteSvgIA(id: string) {
+  try {
+    if (!pb.authStore.isValid || !pb.authStore.model) {
+      return { success: false, error: 'Vous devez être connecté.' };
+    }
+
+    // Vérifier que l'utilisateur est propriétaire
+    const record = await pb.collection('svgIA').getOne(id);
+    if (record.user !== pb.authStore.model.id) {
+      return { success: false, error: 'Vous n\'êtes pas autorisé à supprimer cette lunette.' };
+    }
+
+    await pb.collection('svgIA').delete(id);
+    return { success: true };
+  } catch (error: any) {
+    console.error('Erreur lors de la suppression de la lunette IA:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+// Mettre à jour une lunette IA
+export async function updateSvgIA(id: string, data: Partial<SvgIAData>) {
+  try {
+    if (!pb.authStore.isValid || !pb.authStore.model) {
+      return { success: false, error: 'Vous devez être connecté.' };
+    }
+
+    const record = await pb.collection('svgIA').update(id, data);
+    return { success: true, data: record };
+  } catch (error: any) {
+    console.error('Erreur lors de la mise à jour:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+// ===== FONCTIONS POUR LA COLLECTION MATERIAUX =====
+
+// Récupérer tous les matériaux disponibles
+export async function getMateriaux() {
+  try {
+    const records = await pb.collection('materiaux').getFullList<MateriauData>({
+      sort: 'prix', // Trier par prix croissant
+    });
+    return { success: true, data: records };
+  } catch (error: any) {
+    console.error('Erreur lors de la récupération des matériaux:', error);
     return { success: false, error: error.message };
   }
 }

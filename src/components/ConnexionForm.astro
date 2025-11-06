@@ -95,7 +95,7 @@ import securiteIcon from '../assets/securite.svg';
       </button>
     </form>
 
-    <!-- Séparateur -->
+
     <div class="my-8 text-center">
       <span class="text-sm text-gray-500">Ou continuer avec:</span>
     </div>
@@ -142,7 +142,6 @@ import securiteIcon from '../assets/securite.svg';
     window.dispatchEvent(new CustomEvent('changeAuthView', { detail: 'inscription' }));
   });
 
-  // OAuth Google
   const googleBtn = document.getElementById('google-btn');
   
   googleBtn?.addEventListener('click', async () => {
