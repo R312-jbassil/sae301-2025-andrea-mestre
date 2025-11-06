@@ -5,22 +5,22 @@ import pb from '../../utils/pb';
 
 export const DELETE: APIRoute = async ({ request, cookies }) => {
   try {
-    // Vérifier l'authentification
     const authCookie = cookies.get('pb_auth');
     
-    if (!authCookie) {
-      return new Response(
-        JSON.stringify({ error: 'Vous devez être connecté' }),
-        { status: 401, headers: { 'Content-Type': 'application/json' } }
-      );
+    if (authCookie?.value) {
+      try {
+        const authData = JSON.parse(decodeURIComponent(authCookie.value));
+        if (authData.token && authData.model) {
+          pb.authStore.save(authData.token, authData.model);
+        }
+      } catch (e) {
+        console.error('Erreur lors du chargement de l\'authentification:', e);
+      }
     }
 
-    // Restaurer l'authentification PocketBase
-    pb.authStore.loadFromCookie(authCookie.value || '');
-
-    if (!pb.authStore.isValid) {
+    if (!pb.authStore.isValid || !pb.authStore.model) {
       return new Response(
-        JSON.stringify({ error: 'Session invalide' }),
+        JSON.stringify({ error: 'Vous devez être connecté' }),
         { status: 401, headers: { 'Content-Type': 'application/json' } }
       );
     }

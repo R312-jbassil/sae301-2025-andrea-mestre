@@ -5,14 +5,19 @@ import pb from '../../utils/pb';
 
 export const POST: APIRoute = async ({ request, cookies }) => {
   try {
-    // Vérifier l'authentification (OBLIGATOIRE pour sauvegarder)
     const authCookie = cookies.get('pb_auth');
     
-    if (authCookie) {
-      pb.authStore.loadFromCookie(authCookie.value || '');
+    if (authCookie?.value) {
+      try {
+        const authData = JSON.parse(decodeURIComponent(authCookie.value));
+        if (authData.token && authData.model) {
+          pb.authStore.save(authData.token, authData.model);
+        }
+      } catch (e) {
+        console.error('Erreur lors du chargement de l\'authentification:', e);
+      }
     }
 
-    // Vérifier que l'utilisateur est connecté
     if (!pb.authStore.isValid || !pb.authStore.model) {
       return new Response(
         JSON.stringify({ 

@@ -1,11 +1,13 @@
 ---
 interface Props {
   id: string;
+  type?: 'manuel' | 'ia';
   nom_modele: string;
   nom_personnalisation: string;
-  taille: number;
-  prix: number;
+  taille?: number;
+  prix?: number;
   image?: string;
+  svgCode?: string;
   verres?: string;
   cercles?: string;
   branche?: string;
@@ -13,33 +15,38 @@ interface Props {
 
 const { 
   id, 
+  type = 'manuel',
   nom_modele, 
   nom_personnalisation, 
   taille, 
   prix, 
   image,
+  svgCode,
   verres,
   cercles,
   branche
 } = Astro.props;
 
-// Badge de personnalisation si le modèle est personnalisé
+// Badge de personnalisation
+const isIA = type === 'ia';
 const hasCustomization = nom_personnalisation && nom_personnalisation.trim() !== '';
 ---
 
 <a 
   href={`/lunette/${id}`} 
-  class="block relative bg-gray-100 rounded-lg overflow-hidden border border-gray-200 transition-all duration-200 no-underline text-inherit h-full hover:shadow-md"
+  class="block relative bg-gray-100 rounded-lg overflow-hidden border border-gray-200 transition-all duration-200 no-underline text-inherit h-full hover:shadow-md lunette-card"
 >
   <!-- Badge -->
   <div class="absolute top-3 left-3 bg-brand-brown text-white px-3 py-1.5 rounded text-[0.625rem] font-bold tracking-wide uppercase z-10">
-    {hasCustomization ? 'MODIFIÉ' : 'STANDARD'}
+    {isIA ? '✨ IA' : (hasCustomization ? 'MODIFIÉ' : 'STANDARD')}
   </div>
   
   <!-- Image Section -->
-  <div class="w-full h-[200px] bg-white flex items-center justify-center overflow-hidden">
-    {image ? (
-      <img src={image} alt={nom_personnalisation || nom_modele} class="w-full h-full object-contain p-5" />
+  <div class="w-full h-[200px] bg-white flex items-center justify-center overflow-hidden p-4">
+    {isIA && svgCode ? (
+      <div class="w-full h-full flex items-center justify-center" set:html={svgCode} />
+    ) : image ? (
+      <img src={image} alt={nom_personnalisation || nom_modele} class="w-full h-full object-contain" />
     ) : (
       <svg viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg" class="w-3/5 h-auto text-gray-300">
         <g stroke="currentColor" stroke-width="2" fill="none">
@@ -55,23 +62,29 @@ const hasCustomization = nom_personnalisation && nom_personnalisation.trim() !==
   
   <!-- Content Section -->
   <div class="p-4">
-    <h3 class="font-body text-lg font-semibold text-brand-brown m-0 mb-1 overflow-hidden text-ellipsis whitespace-nowrap">
+    <h3 class="font-body text-lg font-semibold text-brand-brown m-0 mb-1 overflow-hidden text-ellipsis whitespace-nowrap card-title">
       {nom_personnalisation || nom_modele}
     </h3>
-    <p class="font-subtitle text-xs text-gray-600 m-0 mb-3 uppercase tracking-wider">
-      Modèle {nom_modele}
+    <p class="font-subtitle text-xs text-gray-600 m-0 mb-3 uppercase tracking-wider card-subtitle">
+      {isIA ? 'Généré par IA' : `Modèle ${nom_modele}`}
     </p>
     
     <!-- Details -->
-    <div class="flex flex-col gap-0.5 mb-4 text-xs text-gray-700">
-      {taille && <span class="font-body leading-relaxed">• Taille {taille}</span>}
-      {verres && <span class="font-body leading-relaxed">• Verres de {verres}</span>}
-      {cercles && <span class="font-body leading-relaxed">• {cercles}</span>}
-    </div>
+    {!isIA && (
+      <div class="flex flex-col gap-0.5 mb-4 text-xs text-gray-700">
+        {taille && <span class="font-body leading-relaxed">• Taille {taille}</span>}
+        {verres && <span class="font-body leading-relaxed">• Verres de {verres}</span>}
+        {cercles && <span class="font-body leading-relaxed">• {cercles}</span>}
+      </div>
+    )}
     
     <!-- Footer: Price + Actions -->
     <div class="flex justify-between items-center pt-3 border-t border-gray-200">
-      <span class="font-body text-xl font-bold text-brand-brown">{prix} €</span>
+      {prix ? (
+        <span class="font-body text-xl font-bold text-brand-brown">{prix} €</span>
+      ) : (
+        <span class="font-body text-sm text-gray-500 italic">Prix non défini</span>
+      )}
       
       <div class="flex gap-1.5">
         <button 
@@ -95,6 +108,8 @@ const hasCustomization = nom_personnalisation && nom_personnalisation.trim() !==
         <button 
           class="action-btn delete-btn bg-transparent border border-gray-300 rounded p-1.5 cursor-pointer transition-all duration-200 text-gray-600 flex items-center justify-center hover:bg-brand-brown hover:border-brand-brown hover:text-white" 
           aria-label="Supprimer"
+          data-id={id}
+          data-type={type}
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polyline points="3 6 5 6 21 6"></polyline>

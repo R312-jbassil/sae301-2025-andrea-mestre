@@ -143,21 +143,23 @@ export async function updateLunette(id: string, data: Partial<LunetteData>) {
   }
 }
 
-// Supprimer une lunette
-export async function deleteLunette(id: string) {
+// Supprimer une lunette (manuelle ou IA)
+export async function deleteLunette(id: string, type: 'manuel' | 'ia' = 'manuel') {
   try {
     // Vérifier si l'utilisateur est connecté
     if (!pb.authStore.isValid || !pb.authStore.model) {
       return { success: false, error: 'Vous devez être connecté pour supprimer une lunette.' };
     }
 
+    const collection = type === 'ia' ? 'svgIA' : 'lunette';
+
     // Vérifier que l'utilisateur est propriétaire
-    const record = await pb.collection('lunette').getOne(id);
+    const record = await pb.collection(collection).getOne(id);
     if (record.user !== pb.authStore.model.id) {
       return { success: false, error: 'Vous n\'êtes pas autorisé à supprimer cette lunette.' };
     }
 
-    await pb.collection('lunette').delete(id);
+    await pb.collection(collection).delete(id);
     return { success: true };
   } catch (error: any) {
     console.error('Erreur lors de la suppression de la lunette:', error);
@@ -165,7 +167,7 @@ export async function deleteLunette(id: string) {
   }
 }
 
-// Supprimer toutes les lunettes de l'utilisateur connecté (utilisé pour "Tout supprimer")
+// Supprimer toutes les lunettes de l'utilisateur connecté (manuelles ET IA)
 export async function deleteAllLunettes() {
   try {
     // Vérifier si l'utilisateur est connecté
@@ -173,15 +175,24 @@ export async function deleteAllLunettes() {
       return { success: false, error: 'Vous devez être connecté pour supprimer vos lunettes.' };
     }
 
-    // Récupérer UNIQUEMENT les lunettes de l'utilisateur connecté
-    const lunettes = await pb.collection('lunette').getFullList({
+    // Récupérer UNIQUEMENT les lunettes manuelles de l'utilisateur connecté
+    const lunettesManuel = await pb.collection('lunette').getFullList({
       filter: `user = "${pb.authStore.model.id}"`
     });
     
-    // Supprimer toutes les lunettes de l'utilisateur
-    const promises = lunettes.map((lunette: any) => pb.collection('lunette').delete(lunette.id));
-    await Promise.all(promises);
-    return { success: true, count: lunettes.length };
+    // Récupérer UNIQUEMENT les lunettes IA de l'utilisateur connecté
+    const lunettesIA = await pb.collection('svgIA').getFullList({
+      filter: `user = "${pb.authStore.model.id}"`
+    });
+    
+    // Supprimer toutes les lunettes (manuelles et IA)
+    const promisesManuel = lunettesManuel.map((lunette: any) => pb.collection('lunette').delete(lunette.id));
+    const promisesIA = lunettesIA.map((lunette: any) => pb.collection('svgIA').delete(lunette.id));
+    
+    await Promise.all([...promisesManuel, ...promisesIA]);
+    
+    const totalCount = lunettesManuel.length + lunettesIA.length;
+    return { success: true, count: totalCount };
   } catch (error: any) {
     console.error('Erreur lors de la suppression de toutes les lunettes:', error);
     return { success: false, error: error.message };

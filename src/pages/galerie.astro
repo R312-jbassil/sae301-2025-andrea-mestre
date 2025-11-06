@@ -27,12 +27,25 @@ let lunettes: any[] = [];
 let error = '';
 
 try {
-  const resultList = await pb.collection('lunette').getList(1, 50, {
+  // Récupérer les lunettes manuelles
+  const lunettesManuel = await pb.collection('lunette').getList(1, 50, {
     filter: `user = "${user.id}"`,
     sort: '-created',
     expand: 'materiau',
   });
-  lunettes = resultList.items;
+  
+  // Récupérer les lunettes IA
+  const lunettesIA = await pb.collection('svgIA').getList(1, 50, {
+    filter: `user = "${user.id}"`,
+    sort: '-created',
+  });
+  
+  // Fusionner les deux listes avec un indicateur de type
+  lunettes = [
+    ...lunettesManuel.items.map((l: any) => ({ ...l, type: 'manuel' })),
+    ...lunettesIA.items.map((l: any) => ({ ...l, type: 'ia' }))
+  ].sort((a, b) => new Date(b.created).getTime() - new Date(a.created).getTime());
+  
 } catch (e: any) {
   console.error('Erreur lors de la récupération des lunettes:', e);
   error = e.message;
@@ -128,11 +141,13 @@ try {
         {lunettes.map((lunette) => (
           <LunetteCard
             id={lunette.id}
-            nom_modele={lunette.nom_modele || 'Modèle sans nom'}
-            nom_personnalisation={lunette.nom_personnalisation}
+            type={lunette.type}
+            nom_modele={lunette.type === 'manuel' ? lunette.nom_modele : 'Lunettes IA'}
+            nom_personnalisation={lunette.type === 'manuel' ? lunette.nom_personnalisation : lunette.nom}
             taille={lunette.taille}
             prix={lunette.prix}
-            image={lunette.image ? pb.files.getUrl(lunette, lunette.image) : undefined}
+            image={lunette.type === 'manuel' && lunette.image ? pb.files.getUrl(lunette, lunette.image) : undefined}
+            svgCode={lunette.type === 'ia' ? lunette.code : undefined}
             verres={lunette.verres}
             cercles={lunette.cercles}
             branche={lunette.branche}
@@ -171,7 +186,7 @@ try {
 </style>
 
 <script>
-  import { deleteAllLunettes } from '../utils/pb';
+  import { deleteAllLunettes, deleteLunette } from '../utils/pb';
 
   const searchInput = document.getElementById('searchInput') as HTMLInputElement;
   const lunettesGrid = document.getElementById('lunettesGrid');
@@ -194,10 +209,39 @@ try {
     });
   }
 
+  // Gestion de la suppression individuelle
+  document.querySelectorAll('.delete-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      const target = e.currentTarget as HTMLButtonElement;
+      const id = target.dataset.id;
+      const type = target.dataset.type as 'manuel' | 'ia';
+      
+      if (!id) return;
+      
+      if (confirm('Voulez-vous vraiment supprimer cette lunette ?')) {
+        try {
+          const result = await deleteLunette(id, type);
+          
+          if (result.success) {
+            window.location.reload();
+          } else {
+            alert(`Erreur : ${result.error}`);
+          }
+        } catch (error) {
+          console.error('Erreur lors de la suppression:', error);
+          alert('Une erreur est survenue lors de la suppression.');
+        }
+      }
+    });
+  });
+
   const deleteAllBtn = document.getElementById('deleteAllBtn') as HTMLButtonElement;
   if (deleteAllBtn) {
     deleteAllBtn.addEventListener('click', async () => {
-      if (confirm('Êtes-vous sûr de vouloir supprimer toutes vos lunettes ? Cette action est irréversible.')) {
+      if (confirm('Êtes-vous sûr de vouloir supprimer toutes vos lunettes (manuelles ET IA) ? Cette action est irréversible.')) {
         try {
           deleteAllBtn.disabled = true;
           deleteAllBtn.textContent = 'Suppression en cours...';

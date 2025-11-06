@@ -202,6 +202,7 @@ import Header from '../components/Header.astro';
   logoutBtn?.addEventListener('click', () => {
     if (confirm('Voulez-vous vraiment vous déconnecter ?')) {
       pb.authStore.clear();
+      document.cookie = 'pb_auth=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; SameSite=Lax';
       window.location.href = '/';
     }
   });
